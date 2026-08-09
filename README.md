@@ -45,8 +45,7 @@ reason is retained in its diagnostic.
 
 Non-finite core values such as the infinite SNR of a noiseless acquisition are
 serialized as `null` at the workflow boundary. The recipe is deliberately
-single-channel and headless; Desktop/Web registration and multi-channel
-comparison belong to later phases.
+single-channel; multi-channel comparison belongs to a later phase.
 
 Valid shots are aligned on their polarity-aware rising 50% crossing before the
 aligned mean is computed. The reference is the observed median crossing; for
@@ -86,3 +85,20 @@ double pulses, and amplitude outliers. The matching analysis settings recover
 
 See [`doc/simulation.md`](doc/simulation.md) for the model, exact anomaly
 distribution, truth fields, and limitations.
+
+## Desktop and Web hosts
+
+DataLab Desktop registers **Run pulse campaign...** through the plugin entry
+point. The action requires at least two selected signals, opens the shared
+parameter DataSet, and delegates output, anchored-result, rollback, and
+provenance handling to `RecipeRunner`. Installed-wheel, hot-reload, unattended
+form, cancellation, rollback, and native HDF5 round-trip gates exercise the
+real host integration.
+
+DataLab-Web bundles the same plugin as a size- and SHA-256-checked pure-Python
+wheel. Its adapter reports `verified` only for DataLab-Web 0.8.0, Pyodide
+0.26.4, plugin 0.1.0, and recipe 1.1.0. The browser gate executes the
+deterministic 500-shot campaign, checks all visible curves and the 500-row
+metrics table, and enforces explicit retained-data and WASM budgets. See
+[`doc/web-qualification.md`](doc/web-qualification.md) for the evidence and
+scope.
