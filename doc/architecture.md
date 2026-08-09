@@ -20,7 +20,9 @@ The package root exposes identity metadata without importing a host adapter.
 SignalObj inputs
 	-> workflow.campaign (SDK validation and metadata)
 	-> core.campaign (Sigima PulseFeatures plus plugin metrics and diagnostics)
+	-> core.alignment (observed valid lower median x50 plus interpolation)
 	-> amplitude-vs-shot SignalObj
+	-> matched raw/aligned campaign means
 	-> anchored per-shot TableResult
 ```
 
@@ -43,8 +45,21 @@ cancellation callback at that boundary, limiting cancellation latency to one
 shot.
 
 The batch processes one acquisition at a time and does not construct a 2-D
-campaign stack. Phase 5.2 does not include synthetic campaign generation,
-alignment, host UI integration, or multi-channel analysis.
+campaign stack. Alignment also uses one acquisition at a time; its raw and
+aligned means are accumulated over the same valid subset. Host UI integration
+and multi-channel analysis remain outside this layer.
+
+`core.alignment` keeps raw and aligned acquisitions side by side with one
+immutable decision record per shot. It aligns only `VALID` shots on their
+polarity-aware rising 50% crossing and retains all non-valid or unalignable
+shots unchanged. The default reference is the observed median crossing, using
+the lower of the two middle observations for an even count. Consequently,
+disjoint X domains cannot place the reference between every acquisition;
+incompatible valid domains receive an explicit skip record instead of aborting
+the campaign.
+Linear interpolation preserves each per-shot X grid and uses constant edge
+values outside the shifted source range. Aggregation resamples onto the first
+aligned X grid and never materializes a 2-D stack.
 
 ## Synthetic campaign flow
 

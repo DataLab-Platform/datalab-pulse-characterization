@@ -23,9 +23,11 @@ from sigima.tools.signal import pulse as sigima_pulse
 
 from ..core import (
     PulseAcquisition,
+    PulseAlignmentRecord,
     PulseAnalysisParameters,
     PulseShotResult,
     PulseStatus,
+    align_pulse_campaign,
     analyze_pulse_campaign,
     metadata_key,
 )
@@ -183,7 +185,10 @@ def _json_value(value: object) -> object:
     return value
 
 
-def _shot_row(shot: PulseShotResult) -> list[object]:
+def _shot_row(
+    shot: PulseShotResult,
+    alignment: PulseAlignmentRecord,
+) -> list[object]:
     """Return one JSON-friendly consolidated metrics row."""
     features = shot.features
     return [
@@ -206,12 +211,18 @@ def _shot_row(shot: PulseShotResult) -> list[object]:
         None if features is None else _metric(features.fwhm),
         shot.diagnostic_values["saturated_samples"],
         shot.diagnostic_values["pulse_regions"],
+        alignment.aligned,
+        _metric(alignment.landmark_x),
+        _metric(alignment.shift_x),
+        alignment.reason,
     ]
 
 
 def _metrics_table(
     shots: tuple[PulseShotResult, ...],
+    alignments: tuple[PulseAlignmentRecord, ...],
     parameters: PulseAnalysisParameters,
+    alignment_reference_x: float | None,
 ) -> TableResult:
     """Build the per-shot table with explicit scientific conventions."""
     return TableResult(
@@ -237,8 +248,12 @@ def _metrics_table(
             "FWHM",
             "Saturated samples",
             "Pulse regions",
+            "Aligned",
+            "Alignment landmark",
+            "Alignment shift",
+            "Alignment reason",
         ],
-        data=[_shot_row(shot) for shot in shots],
+        data=[_shot_row(shot, alignment) for shot, alignment in zip(shots, alignments)],
         roi_indices=[NO_ROI] * len(shots),
         attrs={
             "measurement_domain": "single_channel_pulse_campaign",
@@ -253,8 +268,29 @@ def _metrics_table(
                 parameters.multiple_pulse_threshold_ratio
             ),
             "outlier_modified_zscore": parameters.outlier_modified_zscore,
+            "alignment_method": "50_percent_crossing",
+            "alignment_reference_x": alignment_reference_x,
+            "alignment_subset": "alignable VALID shots",
+            "alignment_fill": "constant edge values",
         },
     )
+
+
+def _mean_signal(
+    acquisition: PulseAcquisition,
+    template: SignalObj,
+    output_role: str,
+) -> SignalObj:
+    """Convert one core campaign mean to a typed recipe output."""
+    signal = create_signal(
+        acquisition.title,
+        acquisition.x,
+        acquisition.y,
+        units=(template.xunit, template.yunit),
+        labels=(template.xlabel, template.ylabel),
+    )
+    signal.metadata[OUTPUT_ROLE_METADATA_KEY] = output_role
+    return signal
 
 
 def run_pulse_campaign(
@@ -286,10 +322,17 @@ def run_pulse_campaign(
             core_parameters,
             progress_callback=report_shot_progress,
         )
+        alignment = align_pulse_campaign(acquisitions, result)
+        if alignment.aligned_count:
+            raw_mean = alignment.mean_acquisition(aligned=False)
+            aligned_mean = alignment.mean_acquisition(aligned=True)
+        else:
+            raw_mean = None
+            aligned_mean = None
     except (TypeError, ValueError, sigima_pulse.PulseAnalysisError) as error:
         raise RecipeValidationError(str(error)) from error
     context.raise_if_cancelled()
-    context.report_progress(0.8, "Building pulse campaign outputs")
+    context.report_progress(0.8, "Aligned valid pulses at 50% crossing")
 
     first_signal = inputs["signals"][0]
     shots = tuple(result.shots)
@@ -301,8 +344,25 @@ def run_pulse_campaign(
         labels=("Shot", first_signal.ylabel or "Amplitude"),
     )
     anchor.metadata[OUTPUT_ROLE_METADATA_KEY] = "amplitude_vs_shot"
-    table = _metrics_table(shots, core_parameters)
-    diagnostics = tuple(
+    mean_outputs: tuple[RecipeObjectOutput, ...] = ()
+    if raw_mean is not None and aligned_mean is not None:
+        mean_outputs = (
+            RecipeObjectOutput(
+                "raw_mean",
+                _mean_signal(raw_mean, first_signal, "raw_mean"),
+            ),
+            RecipeObjectOutput(
+                "aligned_mean",
+                _mean_signal(aligned_mean, first_signal, "aligned_mean"),
+            ),
+        )
+    table = _metrics_table(
+        shots,
+        tuple(alignment.records),
+        core_parameters,
+        alignment.reference_x,
+    )
+    status_diagnostics = tuple(
         RecipeDiagnostic(
             level=RecipeDiagnosticLevel.WARNING,
             code=shot.status.value.lower(),
@@ -319,9 +379,27 @@ def run_pulse_campaign(
         for shot in shots
         if shot.status is not PulseStatus.VALID
     )
+    alignment_diagnostics = tuple(
+        RecipeDiagnostic(
+            level=RecipeDiagnosticLevel.WARNING,
+            code="alignment_unavailable",
+            message=f"Shot {shot.shot_index}: {alignment_record.reason}",
+            details={
+                "shot": shot.shot_index,
+                "title": shot.title,
+                "alignment_method": "50_percent_crossing",
+                "alignment_reference_x": _metric(alignment.reference_x),
+            },
+        )
+        for shot, alignment_record in zip(shots, alignment.records)
+        if shot.status is PulseStatus.VALID and not alignment_record.aligned
+    )
     context.report_progress(1.0, "Pulse campaign analysis complete")
     return RecipeOutcome(
-        objects=(RecipeObjectOutput("amplitude_vs_shot", anchor),),
+        objects=(
+            RecipeObjectOutput("amplitude_vs_shot", anchor),
+            *mean_outputs,
+        ),
         results=(
             RecipeResultOutput(
                 "shot_metrics",
@@ -329,7 +407,7 @@ def run_pulse_campaign(
                 anchor_id="amplitude_vs_shot",
             ),
         ),
-        diagnostics=diagnostics,
+        diagnostics=(*status_diagnostics, *alignment_diagnostics),
     )
 
 

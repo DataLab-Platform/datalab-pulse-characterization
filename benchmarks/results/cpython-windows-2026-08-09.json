@@ -1,0 +1,42 @@
+{
+  "alignment_elapsed_s_per_run": 0.05324880000000043,
+  "analysis_elapsed_s_per_run": 5.5602288,
+  "backend": "cpython",
+  "benchmark": "pulse-campaign-x50-alignment",
+  "configuration": {
+    "repetitions": 1,
+    "sample_count": 501,
+    "seed": 20260809,
+    "shot_count": 500
+  },
+  "generation_elapsed_s_per_run": 0.1239893999999997,
+  "input_bytes": 4008000,
+  "measured_at": "2026-08-09T18:38:52.618900Z",
+  "memory_measurement": "tracemalloc peak after garbage collection; null when unavailable",
+  "numpy": "2.0.2",
+  "peak_incremental_python_bytes": 9489906,
+  "platform": "Windows-10-10.0.26200-SP0",
+  "pulse": "0.1.0",
+  "pulse_wheel_sha256": "785db2cc3abbe2c4c496516ccd34996af37ac764d8f568a6a14608e81bbc0a0f",
+  "python": "3.9.10",
+  "quality": {
+    "aligned_shot_count": 489,
+    "aligned_truth_x50_std_x": 0.004857135418752522,
+    "alignment_reference_x": 4.216597400995842,
+    "raw_truth_x50_std_x": 0.0808868986611841,
+    "residual_truth_x50_std_ratio": 0.06004848126391768,
+    "status_counts": {
+      "LOW_SNR": 2,
+      "MULTIPLE_PULSES": 2,
+      "NO_PULSE": 2,
+      "OUTLIER": 3,
+      "SATURATED": 2,
+      "VALID": 489
+    },
+    "status_mismatch_count": 0
+  },
+  "shots_per_s": 87.14647073351358,
+  "sigima": "1.1.6",
+  "sigima_wheel_sha256": "2264d7d32411a03bbe51269b3a448a7c78ede6e92ec6c1caedb1526974f09ae7",
+  "total_elapsed_s_per_run": 5.7374670000000005
+}

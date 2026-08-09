@@ -16,10 +16,10 @@ PULSE_CAMPAIGN_RECIPE = RecipeDescriptor(
     recipe_id=f"{PLUGIN_ID}:single-channel-campaign",
     plugin_version=__version__,
     title="Single-channel pulse campaign",
-    version="1.0.0",
+    version="1.1.0",
     description=(
-        "Extract Sigima pulse features and consolidate integral, SNR, and "
-        "explainable quality diagnostics across repeated acquisitions."
+        "Extract Sigima pulse features, align valid shots at their 50% crossings, "
+        "and consolidate explainable diagnostics across repeated acquisitions."
     ),
     inputs=(
         RecipeInputSlot(

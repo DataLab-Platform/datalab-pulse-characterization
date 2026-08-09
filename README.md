@@ -22,8 +22,9 @@ The headless recipe
 `org.datalab.pulse-characterization:single-channel-campaign` accepts an ordered
 series of signals. Inputs may carry a positive integer shot number in
 `plugin.org.datalab.pulse-characterization.shot`; otherwise input order defines
-the shot number. The recipe returns an amplitude-vs-shot `SignalObj` and a
-per-shot `TableResult` attached to that signal.
+the shot number. Recipe contract `1.1.0` returns an amplitude-vs-shot
+`SignalObj`, raw and half-height-aligned campaign means, and a per-shot
+`TableResult` attached to the amplitude signal.
 
 Sigima remains the authority for pulse shape, polarity, amplitude, offset, rise
 and fall times, FWHM, and `x0`/`x50`/`x100`. The plugin adds these explicit
@@ -43,9 +44,21 @@ the campaign as `NO_PULSE`; Sigima-specific columns are `null` and the extractio
 reason is retained in its diagnostic.
 
 Non-finite core values such as the infinite SNR of a noiseless acquisition are
-serialized as `null` at the workflow boundary. Phase 5.2 is deliberately
-single-channel and headless; alignment, Desktop/Web registration, and
-multi-channel comparison belong to later phases.
+serialized as `null` at the workflow boundary. The recipe is deliberately
+single-channel and headless; Desktop/Web registration and multi-channel
+comparison belong to later phases.
+
+Valid shots are aligned on their polarity-aware rising 50% crossing before the
+aligned mean is computed. The reference is the observed median crossing; for
+an even number of landmarks, it is the lower of the two middle observations.
+Non-valid or unalignable shots remain unchanged and are excluded from both raw
+and aligned means, so the comparison always uses the same subset. A valid shot
+whose X domain does not contain the reference is reported with its measured
+crossing and an explicit skip reason. Differently sampled inputs are resampled
+onto the first aligned X grid for aggregation. See
+[`doc/alignment-validation.md`](doc/alignment-validation.md) for interpolation,
+audit records, no-valid-shot behavior, and the 500-shot CPython/Pyodide
+measurements.
 
 ## Deterministic 500-shot simulation
 

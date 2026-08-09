@@ -1,5 +1,12 @@
 """Host-independent domain code."""
 
+from .alignment import (
+    PulseAlignmentMethod,
+    PulseAlignmentParameters,
+    PulseAlignmentRecord,
+    PulseAlignmentResult,
+    align_pulse_campaign,
+)
 from .campaign import (
     PulseAcquisition,
     PulseAnalysisParameters,
@@ -23,6 +30,10 @@ from .simulation import (
 __all__ = [
     "METADATA_PREFIX",
     "PulseAcquisition",
+    "PulseAlignmentMethod",
+    "PulseAlignmentParameters",
+    "PulseAlignmentRecord",
+    "PulseAlignmentResult",
     "PulseAnomaly",
     "PulseAnalysisParameters",
     "PulseCampaignResult",
@@ -33,6 +44,7 @@ __all__ = [
     "PulseSimulationResult",
     "PulseSimulationTruth",
     "PulseStatus",
+    "align_pulse_campaign",
     "analyze_pulse",
     "analyze_pulse_campaign",
     "metadata_key",

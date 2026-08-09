@@ -11,3 +11,7 @@ All notable changes to this project will be documented in this file.
 	diagnostics with strict JSON-friendly outputs.
 - Add a deterministic 500-shot Gaussian/asymmetric campaign simulator with
 	exact drift, jitter, noise, and anomaly truth.
+- Add polarity-aware 50% crossing alignment, matched raw/aligned campaign
+	means, and per-shot alignment audit values to recipe contract `1.1.0`.
+- Record report-only 500-shot performance and alignment-quality measurements
+	under CPython and browser-main-thread Pyodide.

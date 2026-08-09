@@ -15,6 +15,7 @@ from sigima.enums import SignalShape
 from sigima.objects import SignalObj, TableResult, create_signal
 
 from datalab_pulse_characterization.core import PulseStatus
+from datalab_pulse_characterization.core import alignment as alignment_module
 from datalab_pulse_characterization.workflow import (
     OUTPUT_ROLE_METADATA_KEY,
     PULSE_CAMPAIGN_RECIPE,
@@ -68,7 +69,7 @@ def test_campaign_recipe_builds_anchored_table_and_diagnostics() -> None:
         context,
     )
 
-    assert len(outcome.objects) == 1
+    assert len(outcome.objects) == 3
     anchor_output = outcome.objects[0]
     assert anchor_output.id == "amplitude_vs_shot"
     assert isinstance(anchor_output.value, SignalObj)
@@ -79,6 +80,14 @@ def test_campaign_recipe_builds_anchored_table_and_diagnostics() -> None:
     assert anchor_output.value.metadata[OUTPUT_ROLE_METADATA_KEY] == (
         "amplitude_vs_shot"
     )
+    raw_mean, aligned_mean = outcome.objects[1:]
+    assert raw_mean.id == "raw_mean"
+    assert aligned_mean.id == "aligned_mean"
+    assert raw_mean.value.metadata[OUTPUT_ROLE_METADATA_KEY] == "raw_mean"
+    assert aligned_mean.value.metadata[OUTPUT_ROLE_METADATA_KEY] == "aligned_mean"
+    np.testing.assert_array_equal(raw_mean.value.x, aligned_mean.value.x)
+    assert raw_mean.value.xunit == "us"
+    assert aligned_mean.value.yunit == "V"
 
     assert len(outcome.results) == 1
     table_output = outcome.results[0]
@@ -92,6 +101,9 @@ def test_campaign_recipe_builds_anchored_table_and_diagnostics() -> None:
     ]
     assert [row[4] for row in table_output.value.data] == ["square", "square"]
     assert table_output.value.attrs["normative"] is False
+    assert table_output.value.attrs["alignment_method"] == "50_percent_crossing"
+    assert table_output.value.attrs["alignment_subset"] == "alignable VALID shots"
+    assert [row[19] for row in table_output.value.data] == [True, False]
     assert (
         "polarity * (raw signal - raw baseline mean)"
         in (table_output.value.attrs["integral_convention"])
@@ -107,7 +119,7 @@ def test_campaign_recipe_builds_anchored_table_and_diagnostics() -> None:
         (0.0, "Preparing pulse campaign"),
         (0.375, "Analyzed pulse 1/2"),
         (0.75, "Analyzed pulse 2/2"),
-        (0.8, "Building pulse campaign outputs"),
+        (0.8, "Aligned valid pulses at 50% crossing"),
         (1.0, "Pulse campaign analysis complete"),
     ]
 
@@ -115,7 +127,7 @@ def test_campaign_recipe_builds_anchored_table_and_diagnostics() -> None:
 def test_campaign_recipe_descriptor_declares_many_signal_inputs() -> None:
     """The registry exposes the stable single-channel batch contract."""
     assert PULSE_CAMPAIGN_RECIPE.recipe_id.endswith(":single-channel-campaign")
-    assert PULSE_CAMPAIGN_RECIPE.version == "1.0.0"
+    assert PULSE_CAMPAIGN_RECIPE.version == "1.1.0"
     assert len(PULSE_CAMPAIGN_RECIPE.inputs) == 1
     assert PULSE_CAMPAIGN_RECIPE.inputs[0].id == "signals"
     assert PULSE_CAMPAIGN_RECIPE.parameter_class is PulseCampaignRecipeParameters
@@ -219,6 +231,42 @@ def test_campaign_recipe_keeps_flat_missing_pulse_in_outputs() -> None:
     ]
     assert outcome.results[0].value.data[0][4] is None
     json.dumps(outcome.results[0].value.to_dict(), allow_nan=False)
+
+
+def test_campaign_recipe_reports_valid_shot_without_alignment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An unavailable crossing remains visible in the table and diagnostics."""
+    monkeypatch.setattr(
+        alignment_module,
+        "_half_height_landmark",
+        lambda acquisition, shot: None,
+    )
+    parameters = PulseCampaignRecipeParameters()
+    parameters.signal_shape = "square"
+    parameters.use_explicit_ranges = True
+    parameters.xstartmin = 0.0
+    parameters.xstartmax = 1.0
+    parameters.xendmin = 9.0
+    parameters.xendmax = 10.0
+    parameters.denoise = False
+
+    outcome = PULSE_CAMPAIGN_RECIPE.run(
+        {"signals": (_signal("Strong", 4.0, 1),)},
+        parameters,
+        RecipeExecutionContext(),
+    )
+
+    assert [output.id for output in outcome.objects] == ["amplitude_vs_shot"]
+    row = outcome.results[0].value.data[0]
+    assert row[19] is False
+    assert "50% crossing unavailable" in row[22]
+    assert outcome.results[0].value.attrs["alignment_subset"] == (
+        "alignable VALID shots"
+    )
+    assert [diagnostic.code for diagnostic in outcome.diagnostics] == [
+        "alignment_unavailable"
+    ]
 
 
 def test_campaign_recipe_honors_cancellation_between_shots() -> None:

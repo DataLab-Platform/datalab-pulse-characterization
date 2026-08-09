@@ -1,0 +1,48 @@
+{
+  "alignment_elapsed_s_per_run": 0.1031000000000013,
+  "analysis_elapsed_s_per_run": 11.228200000000001,
+  "benchmark": "pulse-campaign-x50-alignment",
+  "configuration": {
+    "repetitions": 1,
+    "sample_count": 501,
+    "seed": 20260809,
+    "shot_count": 500
+  },
+  "generation_elapsed_s_per_run": 0.4234999999999989,
+  "input_bytes": 4008000,
+  "memory_measurement": "tracemalloc peak after garbage collection; null when unavailable",
+  "numpy": "1.26.4",
+  "peak_incremental_python_bytes": 8681312,
+  "platform": "Emscripten-3.1.58-wasm32-32bit",
+  "pulse": "0.1.0",
+  "python": "3.12.1",
+  "quality": {
+    "aligned_shot_count": 489,
+    "aligned_truth_x50_std_x": 0.004857135418752522,
+    "alignment_reference_x": 4.216597400995842,
+    "raw_truth_x50_std_x": 0.0808868986611841,
+    "residual_truth_x50_std_ratio": 0.06004848126391768,
+    "status_counts": {
+      "LOW_SNR": 2,
+      "MULTIPLE_PULSES": 2,
+      "NO_PULSE": 2,
+      "OUTLIER": 3,
+      "SATURATED": 2,
+      "VALID": 489
+    },
+    "status_mismatch_count": 0
+  },
+  "shots_per_s": 42.53581515636165,
+  "sigima": "1.1.6",
+  "total_elapsed_s_per_run": 11.754800000000001,
+  "backend": "pyodide_browser_main_thread",
+  "pyodide_version": "0.26.4",
+  "browser_wall_elapsed_s": 11.92710000000149,
+  "wasm_bytes_before": 187695104,
+  "wasm_bytes_after": 187695104,
+  "wasm_growth_bytes": 0,
+  "measured_at": "2026-08-09T18:39:28.550Z",
+  "chromium_version": "147.0.7727.15",
+  "pulse_wheel_sha256": "785db2cc3abbe2c4c496516ccd34996af37ac764d8f568a6a14608e81bbc0a0f",
+  "sigima_wheel_sha256": "2264d7d32411a03bbe51269b3a448a7c78ede6e92ec6c1caedb1526974f09ae7"
+}
