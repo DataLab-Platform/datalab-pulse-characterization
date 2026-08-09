@@ -45,3 +45,23 @@ shot.
 The batch processes one acquisition at a time and does not construct a 2-D
 campaign stack. Phase 5.2 does not include synthetic campaign generation,
 alignment, host UI integration, or multi-channel analysis.
+
+## Synthetic campaign flow
+
+```text
+PulseSimulationParameters
+	-> core.simulation (seeded NumPy generation)
+	-> PulseAcquisition[500] + PulseSimulationTruth
+	-> core.campaign (unchanged production analysis path)
+	-> explainable status comparison
+```
+
+`core.simulation` depends on the same immutable acquisition and parameter types
+as production analysis. It does not duplicate feature extraction or quality
+classification. The returned `analysis_parameters` describe the thresholds
+used to compare generated truth with `core.campaign`; all measured features and
+statuses still come from the normal Sigima-backed path.
+
+Simulation truth is test and demonstration evidence only. It is not imported by
+the workflow recipe and does not weaken the requirement for documented real
+acquisitions and scientific review before a stable release.

@@ -44,5 +44,32 @@ reason is retained in its diagnostic.
 
 Non-finite core values such as the infinite SNR of a noiseless acquisition are
 serialized as `null` at the workflow boundary. Phase 5.2 is deliberately
-single-channel and headless; the campaign simulator, alignment, Desktop/Web
-registration, and multi-channel comparison belong to later phases.
+single-channel and headless; alignment, Desktop/Web registration, and
+multi-channel comparison belong to later phases.
+
+## Deterministic 500-shot simulation
+
+Phase 5.3 adds a host-independent demonstration campaign with exact per-shot
+truth:
+
+```python
+from datalab_pulse_characterization.core import (
+	analyze_pulse_campaign,
+	simulate_pulse_campaign,
+)
+
+simulation = simulate_pulse_campaign()
+analysis = analyze_pulse_campaign(
+	simulation.acquisitions,
+	simulation.analysis_parameters,
+)
+```
+
+The default seed produces 500 alternating Gaussian and asymmetric pulses with
+slow baseline and amplitude drift. Timing jitter increases after shot 300.
+Eleven acquisitions deliberately cover missing pulses, low SNR, saturation,
+double pulses, and amplitude outliers. The matching analysis settings recover
+489 `VALID` shots and all 11 expected explainable flags.
+
+See [`doc/simulation.md`](doc/simulation.md) for the model, exact anomaly
+distribution, truth fields, and limitations.
