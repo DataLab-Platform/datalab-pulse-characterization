@@ -3,6 +3,7 @@
 from datalab.plugins import PluginCapability
 
 from datalab_pulse_characterization.adapters import desktop
+from datalab_pulse_characterization.workflow import PULSE_CAMPAIGN_RECIPE
 
 
 def test_plugin_descriptor() -> None:
@@ -16,3 +17,4 @@ def test_plugin_descriptor() -> None:
             PluginCapability.PROCESSING,
         }
     )
+    assert plugin_class.RECIPES == (PULSE_CAMPAIGN_RECIPE,)
