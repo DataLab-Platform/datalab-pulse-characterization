@@ -45,7 +45,9 @@ reason is retained in its diagnostic.
 
 Non-finite core values such as the infinite SNR of a noiseless acquisition are
 serialized as `null` at the workflow boundary. The recipe is deliberately
-single-channel; multi-channel comparison belongs to a later phase.
+limited to one channel and one acquisition configuration. Inter-channel timing
+and configuration comparison are deferred with explicit activation gates in
+[`doc/deferred-scope.md`](doc/deferred-scope.md).
 
 Valid shots are aligned on their polarity-aware rising 50% crossing before the
 aligned mean is computed. The reference is the observed median crossing; for

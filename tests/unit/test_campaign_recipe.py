@@ -19,6 +19,7 @@ from datalab_pulse_characterization.core import alignment as alignment_module
 from datalab_pulse_characterization.workflow import (
     OUTPUT_ROLE_METADATA_KEY,
     PULSE_CAMPAIGN_RECIPE,
+    RECIPES,
     SHOT_METADATA_KEY,
     PulseCampaignRecipeParameters,
 )
@@ -126,7 +127,9 @@ def test_campaign_recipe_builds_anchored_table_and_diagnostics() -> None:
 
 def test_campaign_recipe_descriptor_declares_many_signal_inputs() -> None:
     """The registry exposes the stable single-channel batch contract."""
+    assert RECIPES == (PULSE_CAMPAIGN_RECIPE,)
     assert PULSE_CAMPAIGN_RECIPE.recipe_id.endswith(":single-channel-campaign")
+    assert PULSE_CAMPAIGN_RECIPE.title == "Single-channel pulse campaign"
     assert PULSE_CAMPAIGN_RECIPE.version == "1.1.0"
     assert len(PULSE_CAMPAIGN_RECIPE.inputs) == 1
     assert PULSE_CAMPAIGN_RECIPE.inputs[0].id == "signals"

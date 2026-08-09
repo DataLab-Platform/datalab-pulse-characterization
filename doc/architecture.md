@@ -9,7 +9,7 @@ adapters -> workflow -> core
 - `core` owns host-independent domain behavior and does not import DataLab.
 - `workflow` may use DataLab's headless recipe contracts, but not GUI modules.
 - `adapters/desktop.py` is the installed DataLab plugin entry point.
-- `adapters/web.py` records Web support explicitly and starts as unsupported.
+- `adapters/web.py` records the exact verified DataLab-Web/Pyodide matrix.
 
 The package root exposes identity metadata without importing a host adapter.
 `tests/unit/test_architecture.py` checks these boundaries as the project grows.
@@ -46,8 +46,11 @@ shot.
 
 The batch processes one acquisition at a time and does not construct a 2-D
 campaign stack. Alignment also uses one acquisition at a time; its raw and
-aligned means are accumulated over the same valid subset. Host UI integration
-and multi-channel analysis remain outside this layer.
+aligned means are accumulated over the same valid subset. The sole registered
+recipe represents repeated shots from one channel under one acquisition
+configuration. It neither infers channel/configuration identity nor computes
+comparisons across them. The deferred contracts and activation gates are
+recorded in [`deferred-scope.md`](deferred-scope.md).
 
 `core.alignment` keeps raw and aligned acquisitions side by side with one
 immutable decision record per shot. It aligns only `VALID` shots on their
