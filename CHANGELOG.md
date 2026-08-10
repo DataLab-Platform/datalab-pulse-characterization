@@ -24,3 +24,5 @@ All notable changes to this project will be documented in this file.
 - Freeze the V1 scope at one channel and one acquisition configuration; defer
 	inter-channel timing and configuration comparison until their data,
 	scientific-validation, and host-qualification gates are defined.
+- Connect the DataLab Applications catalog to the existing Pulse workflow and
+	project documentation.

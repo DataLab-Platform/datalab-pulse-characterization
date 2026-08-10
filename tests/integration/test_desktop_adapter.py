@@ -56,6 +56,12 @@ def test_plugin_descriptor() -> None:
         }
     )
     assert plugin_class.get_recipes() == (PULSE_CAMPAIGN_RECIPE,)
+    assert plugin_class.get_recipe_launchers() == {
+        PULSE_CAMPAIGN_RECIPE.recipe_id: "run_campaign_from_selection"
+    }
+    assert plugin_class.PLUGIN_INFO.documentation_url == (
+        "https://github.com/DataLab-Platform/datalab-pulse-characterization"
+    )
     assert PULSE_CAMPAIGN_RECIPE.version == "1.1.0"
     assert PULSE_CAMPAIGN_RECIPE.parameter_class is PulseCampaignRecipeParameters
 

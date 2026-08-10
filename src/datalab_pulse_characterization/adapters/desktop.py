@@ -31,8 +31,14 @@ class PulseTransientCharacterizationPlugin(PluginBase):
             PluginCapability.APPLICATION,
             PluginCapability.PROCESSING,
         ),
+        documentation_url=(
+            "https://github.com/DataLab-Platform/datalab-pulse-characterization"
+        ),
     )
     RECIPES = WORKFLOW_RECIPES
+    RECIPE_LAUNCHERS = {
+        PULSE_CAMPAIGN_RECIPE.recipe_id: "run_campaign_from_selection",
+    }
 
     @staticmethod
     def can_run_campaign(_selected_groups, selected_objects) -> bool:
