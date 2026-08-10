@@ -198,7 +198,7 @@ def test_flat_acquisition_becomes_no_pulse_without_sigima_features() -> None:
     assert result.features is None
     assert result.amplitude == 0.0
     assert result.baseline_noise_rms == 0.0
-    assert result.integral == pytest.approx(0.0)
+    assert result.integral is None
     assert result.snr_db == -np.inf
     assert result.status is PulseStatus.NO_PULSE
     assert result.diagnostic_values["extraction_error"]

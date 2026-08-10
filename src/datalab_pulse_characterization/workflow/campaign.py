@@ -259,7 +259,8 @@ def _metrics_table(
             "measurement_domain": "single_channel_pulse_campaign",
             "normative": False,
             "integral_convention": (
-                "Trapezoidal integral of polarity * (raw signal - raw baseline mean)"
+                "Trapezoidal integral of polarity * (raw signal - raw baseline "
+                "mean); null when polarity is unknown (NO_PULSE shots)"
             ),
             "snr_convention": "20*log10(amplitude/raw baseline noise RMS)",
             "minimum_amplitude": parameters.minimum_amplitude,

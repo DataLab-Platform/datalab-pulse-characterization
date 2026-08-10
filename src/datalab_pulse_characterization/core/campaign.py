@@ -155,7 +155,8 @@ class PulseShotResult:
     title: str
     features: sigima_pulse.PulseFeatures | None
     amplitude: float
-    integral: float
+    # None when Sigima extraction failed: without polarity the sign is unknown
+    integral: float | None
     baseline_noise_rms: float
     snr_db: float
     status: PulseStatus
@@ -306,7 +307,7 @@ def analyze_pulse(
             title=title,
             features=None,
             amplitude=amplitude,
-            integral=float(scipy.integrate.trapezoid(y - baseline_mean, x)),
+            integral=None,
             baseline_noise_rms=baseline_noise_rms,
             snr_db=_snr_db(amplitude, baseline_noise_rms),
             status=PulseStatus.NO_PULSE,
