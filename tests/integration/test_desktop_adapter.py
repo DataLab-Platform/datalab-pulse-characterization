@@ -7,6 +7,7 @@ import pytest
 from datalab.adapters_metadata import TableAdapter
 from datalab.env import execenv
 from datalab.gui.actionhandler import ActionCategory
+from datalab.objectmodel import get_uuid
 from datalab.plugins import PluginCapability
 from datalab.recipes import RECIPE_RUN_RECORD_OPTION, RecipeRunRecord
 from datalab.tests import datalab_test_app_context
@@ -77,6 +78,43 @@ def test_desktop_adapter_materializes_demo_campaign() -> None:
     assert len(data.objects) == 500
     assert all(SHOT_METADATA_KEY in signal.metadata for signal in data.objects)
     assert data.parameter_values["use_explicit_ranges"] is True
+
+
+def test_desktop_adapter_launches_full_demo_atomically(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The Desktop opens, selects, and plots the complete 500-shot campaign."""
+    with (
+        execenv.context(unattended=True),
+        datalab_test_app_context(console=False, exec_loop=False) as window,
+    ):
+        plugin = desktop_adapter.PulseTransientCharacterizationPlugin()
+        plugin.main = window
+        added_notifications: list[None] = []
+        selection_sizes: list[int] = []
+        window.signalpanel.SIG_OBJECT_ADDED.connect(
+            lambda: added_notifications.append(None)
+        )
+        window.signalpanel.objview.SIG_SELECTION_CHANGED.connect(
+            lambda: selection_sizes.append(
+                len(window.signalpanel.objview.get_sel_objects())
+            )
+        )
+        monkeypatch.setattr(window, "confirm_memory_state", lambda: True)
+
+        opened = plugin.launch_example("demo")
+
+        signals = window.signalpanel.objmodel.get_all_objects()
+        items = [
+            window.signalpanel.plothandler.get(get_uuid(signal)) for signal in signals
+        ]
+        assert opened is desktop_adapter.PULSE_DEMO
+        assert len(signals) == 500
+        assert window.signalpanel.objview.get_sel_objects() == signals
+        assert added_notifications == [None]
+        assert selection_sizes == [500]
+        assert all(item is not None and item.isVisible() for item in items)
+        window.reset_all()
 
 
 def test_desktop_parameter_editor_prefills_demo_values(
