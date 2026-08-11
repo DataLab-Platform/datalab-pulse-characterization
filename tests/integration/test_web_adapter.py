@@ -4,14 +4,16 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from datalab.plugins import PluginCapability
 from datalab.recipes import RecipeValidationError
 from sigima.objects import create_signal
 
 from datalab_pulse_characterization import PLUGIN_ID, __version__
 from datalab_pulse_characterization.adapters.web import (
+    PULSE_DEMO,
     WEB_STATUS,
+    PulseTransientCharacterizationWebPlugin,
     build_recipe_inputs,
-    build_simulated_campaign,
     get_web_manifest,
     run_pulse_campaign_recipe,
 )
@@ -50,6 +52,14 @@ def test_web_adapter_declares_verified_version_matrix() -> None:
         "recipe_id": PULSE_CAMPAIGN_RECIPE.recipe_id,
         "recipe_version": PULSE_CAMPAIGN_RECIPE.version,
     }
+    assert PulseTransientCharacterizationWebPlugin.get_plugin_id() == PLUGIN_ID
+    assert PulseTransientCharacterizationWebPlugin.get_recipes() == (
+        PULSE_CAMPAIGN_RECIPE,
+    )
+    assert PulseTransientCharacterizationWebPlugin.get_examples() == (PULSE_DEMO,)
+    assert PluginCapability.APPLICATION in (
+        PulseTransientCharacterizationWebPlugin.PLUGIN_INFO.capabilities
+    )
 
 
 def test_web_adapter_maps_signals_and_runs_headless_recipe() -> None:
@@ -81,7 +91,12 @@ def test_web_adapter_rejects_incomplete_or_unknown_inputs() -> None:
 
 def test_web_adapter_builds_reproducible_qualification_campaign() -> None:
     """The browser gate uses the documented deterministic 500-shot scenario."""
-    signals, parameters = build_simulated_campaign()
+    materialized = PulseTransientCharacterizationWebPlugin.materialize_example(
+        "demo"
+    )
+    assert materialized is not None
+    signals = materialized.objects
+    parameters = materialized.parameter_values
 
     assert len(signals) == 500
     assert signals[0].title == "Synthetic shot 001"

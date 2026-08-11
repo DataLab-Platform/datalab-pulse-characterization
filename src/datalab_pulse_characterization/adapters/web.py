@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 
+from datalab.plugin_examples import PluginExample, PluginExampleData
+from datalab.plugins import PluginBase, PluginCapability, PluginInfo
 from datalab.recipes import (
     RecipeExecutionContext,
     RecipeInputs,
@@ -12,7 +14,7 @@ from datalab.recipes import (
 )
 from sigima.objects import SignalObj, create_signal
 
-from .. import PLUGIN_ID, __version__
+from .. import PLUGIN_DESCRIPTION, PLUGIN_ID, PLUGIN_NAME, __version__
 from ..core import PulseAnalysisParameters, simulate_pulse_campaign
 from ..workflow import (
     PULSE_CAMPAIGN_RECIPE,
@@ -23,6 +25,45 @@ from ..workflow import (
 WEB_STATUS = "verified"
 DATALAB_WEB_VERSION = "0.8.0"
 PYODIDE_VERSION = "0.26.4"
+
+PULSE_DEMO = PluginExample(
+    id="demo",
+    title="Synthetic pulse campaign",
+    description="Deterministic 500-shot campaign with explainable quality cases.",
+    recipe_id=PULSE_CAMPAIGN_RECIPE.recipe_id,
+)
+
+
+class PulseTransientCharacterizationWebPlugin(PluginBase):
+    """Declare the Pulse application contract supported by DataLab-Web."""
+
+    PLUGIN_INFO = PluginInfo(
+        id=PLUGIN_ID,
+        name=PLUGIN_NAME,
+        version=__version__,
+        description=PLUGIN_DESCRIPTION,
+        capabilities=(
+            PluginCapability.APPLICATION,
+            PluginCapability.PROCESSING,
+        ),
+        documentation_url=(
+            "https://github.com/DataLab-Platform/datalab-pulse-characterization"
+        ),
+    )
+    RECIPES = (PULSE_CAMPAIGN_RECIPE,)
+    EXAMPLES = (PULSE_DEMO,)
+
+    def create_actions(self) -> None:
+        """Application actions are provided by DataLab-Web's generic host."""
+
+    @classmethod
+    def materialize_example(cls, example_id: str) -> PluginExampleData | None:
+        """Build the deterministic browser qualification campaign."""
+        cls.get_example(example_id)
+        if example_id != PULSE_DEMO.id:
+            return None
+        signals, parameter_values = build_simulated_campaign()
+        return PluginExampleData(signals, parameter_values)
 
 
 def get_web_manifest() -> dict[str, str]:
@@ -132,7 +173,9 @@ def build_simulated_campaign() -> tuple[tuple[SignalObj, ...], dict[str, object]
 
 __all__ = [
     "DATALAB_WEB_VERSION",
+    "PULSE_DEMO",
     "PYODIDE_VERSION",
+    "PulseTransientCharacterizationWebPlugin",
     "WEB_STATUS",
     "build_recipe_inputs",
     "build_simulated_campaign",

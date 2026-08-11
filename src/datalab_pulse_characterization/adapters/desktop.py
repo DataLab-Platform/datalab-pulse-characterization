@@ -86,7 +86,7 @@ class PulseTransientCharacterizationPlugin(PluginBase):
     def create_actions(self) -> None:
         """Create the complete single-channel Pulse campaign action."""
         handler = self.signalpanel.acthandler
-        with handler.new_menu(PLUGIN_NAME):
+        with handler.new_menu(PLUGIN_NAME.replace("&", "&&")):
             self.run_campaign_action = handler.new_action(
                 _("Run pulse campaign..."),
                 triggered=self.run_campaign_from_selection,
