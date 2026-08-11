@@ -91,9 +91,7 @@ def test_web_adapter_rejects_incomplete_or_unknown_inputs() -> None:
 
 def test_web_adapter_builds_reproducible_qualification_campaign() -> None:
     """The browser gate uses the documented deterministic 500-shot scenario."""
-    materialized = PulseTransientCharacterizationWebPlugin.materialize_example(
-        "demo"
-    )
+    materialized = PulseTransientCharacterizationWebPlugin.materialize_example("demo")
     assert materialized is not None
     signals = materialized.objects
     parameters = materialized.parameter_values

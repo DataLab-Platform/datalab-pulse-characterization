@@ -56,6 +56,7 @@ def test_plugin_descriptor() -> None:
         }
     )
     assert plugin_class.get_recipes() == (PULSE_CAMPAIGN_RECIPE,)
+    assert plugin_class.get_examples() == (desktop_adapter.PULSE_DEMO,)
     assert plugin_class.get_recipe_launchers() == {
         PULSE_CAMPAIGN_RECIPE.recipe_id: "run_campaign_from_selection"
     }
@@ -64,6 +65,36 @@ def test_plugin_descriptor() -> None:
     )
     assert PULSE_CAMPAIGN_RECIPE.version == "1.1.0"
     assert PULSE_CAMPAIGN_RECIPE.parameter_class is PulseCampaignRecipeParameters
+
+
+def test_desktop_adapter_materializes_demo_campaign() -> None:
+    """The Desktop demo matches the Web qualification campaign contract."""
+    plugin_class = desktop_adapter.PulseTransientCharacterizationPlugin
+
+    data = plugin_class.materialize_example("demo")
+
+    assert data is not None
+    assert len(data.objects) == 500
+    assert all(SHOT_METADATA_KEY in signal.metadata for signal in data.objects)
+    assert data.parameter_values["use_explicit_ranges"] is True
+
+
+def test_desktop_parameter_editor_prefills_demo_values(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """After opening the demo, the parameter form starts from its values."""
+    plugin = desktop_adapter.PulseTransientCharacterizationPlugin()
+    plugin.main = object()
+    plugin.last_example_data = plugin.materialize_example("demo")
+    monkeypatch.setattr(
+        PulseCampaignRecipeParameters, "edit", lambda _self, *, parent: True
+    )
+
+    parameters = plugin.edit_campaign_parameters()
+
+    assert parameters is not None
+    assert parameters.use_explicit_ranges is True
+    assert parameters.denoise == plugin.last_example_data.parameter_values["denoise"]
 
 
 @pytest.mark.parametrize("accepted", [True, False])

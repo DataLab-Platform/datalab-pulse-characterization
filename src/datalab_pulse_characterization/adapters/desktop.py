@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from datalab.config import _
 from datalab.gui.recipe_runner import RecipeCommitError, RecipeRunner
+from datalab.plugin_examples import PluginExample, PluginExampleData
 from datalab.plugins import PluginBase, PluginCapability, PluginInfo
 from datalab.recipes import RecipeOutcome, RecipeValidationError
 
 from .. import PLUGIN_DESCRIPTION, PLUGIN_ID, PLUGIN_NAME, __version__
+from ..demo import PULSE_DEMO, apply_parameter_values, build_simulated_campaign
 from ..workflow import (
     PULSE_CAMPAIGN_RECIPE,
     PulseCampaignRecipeParameters,
@@ -36,9 +38,31 @@ class PulseTransientCharacterizationPlugin(PluginBase):
         ),
     )
     RECIPES = WORKFLOW_RECIPES
+    EXAMPLES = (PULSE_DEMO,)
     RECIPE_LAUNCHERS = {
         PULSE_CAMPAIGN_RECIPE.recipe_id: "run_campaign_from_selection",
     }
+
+    @classmethod
+    def materialize_example(cls, example_id: str) -> PluginExampleData | None:
+        """Build the deterministic demonstration campaign in memory."""
+        cls.get_example(example_id)
+        if example_id != PULSE_DEMO.id:
+            return None
+        signals, parameter_values = build_simulated_campaign()
+        return PluginExampleData(signals, parameter_values)
+
+    def launch_example(self, example_id: str) -> PluginExample | None:
+        """Open the demo campaign and select its signals for the recipe."""
+        example = super().launch_example(example_id)
+        if example is not None:
+            signals = self.signalpanel.objmodel.get_all_objects()
+            self.signalpanel.objview.select_objects(signals)
+        return example
+
+    def open_demo_campaign(self) -> PluginExample | None:
+        """Open the demonstration campaign from the plugin menu."""
+        return self.launch_example(PULSE_DEMO.id)
 
     @staticmethod
     def can_run_campaign(_selected_groups, selected_objects) -> bool:
@@ -54,6 +78,11 @@ class PulseTransientCharacterizationPlugin(PluginBase):
             raise RuntimeError("Plugin must be registered before editing parameters")
         if parameters is None:
             parameters = PulseCampaignRecipeParameters()
+            if self.last_example_data is not None:
+                # Seed the dialog with the opened demo's reference values.
+                apply_parameter_values(
+                    parameters, self.last_example_data.parameter_values
+                )
         elif not isinstance(parameters, PulseCampaignRecipeParameters):
             raise TypeError("Parameters must be PulseCampaignRecipeParameters")
         if parameters.edit(parent=self.main):
@@ -84,9 +113,15 @@ class PulseTransientCharacterizationPlugin(PluginBase):
             return None
 
     def create_actions(self) -> None:
-        """Create the complete single-channel Pulse campaign action."""
+        """Create the complete single-channel Pulse campaign actions."""
         handler = self.signalpanel.acthandler
         with handler.new_menu(PLUGIN_NAME.replace("&", "&&")):
+            self.open_demo_action = handler.new_action(
+                _("Open demo campaign"),
+                triggered=self.open_demo_campaign,
+                tip=_("Generate and select the synthetic 500-shot pulse campaign"),
+                select_condition="always",
+            )
             self.run_campaign_action = handler.new_action(
                 _("Run pulse campaign..."),
                 triggered=self.run_campaign_from_selection,
