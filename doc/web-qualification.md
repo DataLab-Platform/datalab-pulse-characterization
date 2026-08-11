@@ -4,7 +4,7 @@ The Pulse Web adapter is tested against one explicit browser matrix:
 
 | Component             | Version |
 | --------------------- | ------- |
-| DataLab-Web           | 0.8.0   |
+| DataLab-Web           | 0.9.0   |
 | Pyodide               | 0.26.4  |
 | Pulse plugin          | 0.1.0   |
 | Pulse campaign recipe | 1.1.0   |
@@ -38,8 +38,9 @@ arrays are outside the increment. The recipe must satisfy both limits:
 - incremental WASM linear heap: at most 64 MiB;
 - retained output signal arrays: exactly 24,032 bytes for this fixed campaign.
 
-The qualified Windows/Chromium run retained 4,008,000 bytes of input arrays,
-grew the WASM heap by 0 bytes, and retained 24,032 bytes of output arrays.
+The qualified Windows/Chromium run on 2026-08-11 retained 4,008,000 bytes of
+input arrays, grew the WASM heap by 0 bytes, and retained 24,032 bytes of output
+arrays.
 DataLab-Web's retained-data counter has a regression gate ensuring a signal's
 `data` alias does not count its Y array twice.
 

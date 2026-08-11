@@ -19,7 +19,7 @@ All notable changes to this project will be documented in this file.
 	the installed wheel, parameter form, hot reload, rollback, provenance, and
 	native HDF5 round trip.
 - Add a DataLab-Web adapter and deterministic browser campaign, promoted to
-	`verified` for the pinned 0.8.0 / Pyodide 0.26.4 matrix after visible-output,
+	`verified` for the pinned 0.9.0 / Pyodide 0.26.4 matrix after visible-output,
 	transaction, wheel-integrity, and memory gates passed.
 - Freeze the V1 scope at one channel and one acquisition configuration; defer
 	inter-channel timing and configuration comparison until their data,

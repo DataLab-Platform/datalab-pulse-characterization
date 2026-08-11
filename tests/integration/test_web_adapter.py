@@ -47,7 +47,7 @@ def test_web_adapter_declares_verified_version_matrix() -> None:
         "plugin_id": PLUGIN_ID,
         "plugin_version": __version__,
         "web_status": "verified",
-        "datalab_web_version": "0.8.0",
+        "datalab_web_version": "0.9.0",
         "pyodide_version": "0.26.4",
         "recipe_id": PULSE_CAMPAIGN_RECIPE.recipe_id,
         "recipe_version": PULSE_CAMPAIGN_RECIPE.version,

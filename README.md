@@ -98,7 +98,7 @@ form, cancellation, rollback, and native HDF5 round-trip gates exercise the
 real host integration.
 
 DataLab-Web bundles the same plugin as a size- and SHA-256-checked pure-Python
-wheel. Its adapter reports `verified` only for DataLab-Web 0.8.0, Pyodide
+wheel. Its adapter reports `verified` only for DataLab-Web 0.9.0, Pyodide
 0.26.4, plugin 0.1.0, and recipe 1.1.0. The browser gate executes the
 deterministic 500-shot campaign, checks all visible curves and the 500-row
 metrics table, and enforces explicit retained-data and WASM budgets. See
