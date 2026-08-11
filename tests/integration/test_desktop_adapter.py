@@ -214,6 +214,9 @@ def test_desktop_action_commits_curves_table_and_provenance(
             "Raw pulse campaign mean",
             "Aligned pulse campaign mean",
         ]
+        assert window.get_current_panel() == "signal"
+        assert window.signalpanel.objview.get_sel_objects() == [outputs[-1]]
+        assert window.signalpanel.objview.get_current_object() is outputs[-1]
         anchor = outputs[0]
         tables = list(TableAdapter.iterate_from_obj(anchor))
         assert len(tables) == 1
