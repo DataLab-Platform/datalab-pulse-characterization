@@ -26,3 +26,4 @@ All notable changes to this project will be documented in this file.
 	scientific-validation, and host-qualification gates are defined.
 - Connect the DataLab Applications catalog to the existing Pulse workflow and
 	project documentation.
+- Add a dedicated plugin icon and two DataLab welcome page tiles: one opens the Pulse application page, the other opens the demo campaign.

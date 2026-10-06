@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from importlib import resources
+from types import SimpleNamespace
+
 import numpy as np
 import pytest
 from datalab.adapters_metadata import TableAdapter
@@ -13,6 +16,7 @@ from datalab.recipes import RECIPE_RUN_RECORD_OPTION, RecipeRunRecord
 from datalab.tests import datalab_test_app_context
 from sigima.objects import SignalObj, create_signal
 
+from datalab_pulse_characterization import PLUGIN_ID, PLUGIN_NAME
 from datalab_pulse_characterization.adapters import desktop as desktop_adapter
 from datalab_pulse_characterization.core import metadata_key
 from datalab_pulse_characterization.workflow import (
@@ -66,6 +70,43 @@ def test_plugin_descriptor() -> None:
     )
     assert PULSE_CAMPAIGN_RECIPE.version == "1.1.0"
     assert PULSE_CAMPAIGN_RECIPE.parameter_class is PulseCampaignRecipeParameters
+
+
+def test_plugin_declares_packaged_welcome_tiles() -> None:
+    """The application and demo tiles use icons shipped with the package."""
+    plugin_class = desktop_adapter.PulseTransientCharacterizationPlugin
+    icons = resources.files("datalab_pulse_characterization") / "icons"
+
+    tiles = plugin_class.get_welcome_tiles()
+
+    assert plugin_class.PLUGIN_INFO.icon == desktop_adapter.PLUGIN_ICON
+    assert [(tile.id, tile.launcher) for tile in tiles] == [
+        ("application", None),
+        ("demo-campaign", "open_demo_campaign"),
+    ]
+    assert tiles[0].title == PLUGIN_NAME
+    assert [tile.icon for tile in tiles] == [
+        desktop_adapter.PLUGIN_ICON,
+        desktop_adapter.DEMO_ICON,
+    ]
+    assert (icons / "pulse_characterization.svg").is_file()
+    assert (icons / "pulse_demo.svg").is_file()
+
+
+def test_welcome_tiles_open_application_page_and_demo(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The default tile opens the catalog page; the demo tile opens the demo."""
+    plugin = desktop_adapter.PulseTransientCharacterizationPlugin()
+    shown_pages: list[str] = []
+    plugin.main = SimpleNamespace(show_applications=shown_pages.append)
+    monkeypatch.setattr(
+        plugin, "open_demo_campaign", lambda: desktop_adapter.PULSE_DEMO
+    )
+
+    assert plugin.launch_welcome_tile("application") is None
+    assert shown_pages == [PLUGIN_ID]
+    assert plugin.launch_welcome_tile("demo-campaign") is desktop_adapter.PULSE_DEMO
 
 
 def test_desktop_adapter_materializes_demo_campaign() -> None:

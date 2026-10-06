@@ -5,6 +5,7 @@ from __future__ import annotations
 from datalab.config import _
 from datalab.gui.recipe_runner import RecipeCommitError, RecipeRunner
 from datalab.plugin_examples import PluginExample, PluginExampleData
+from datalab.plugin_tiles import WelcomeTile
 from datalab.plugins import PluginBase, PluginCapability, PluginInfo
 from datalab.recipes import RecipeOutcome, RecipeValidationError
 
@@ -19,6 +20,8 @@ from ..workflow import (
 )
 
 MINIMUM_SELECTED_SIGNAL_COUNT = 2
+PLUGIN_ICON = "datalab_pulse_characterization:icons/pulse_characterization.svg"
+DEMO_ICON = "datalab_pulse_characterization:icons/pulse_demo.svg"
 
 
 class PulseTransientCharacterizationPlugin(PluginBase):
@@ -29,6 +32,7 @@ class PulseTransientCharacterizationPlugin(PluginBase):
         name=PLUGIN_NAME,
         version=__version__,
         description=PLUGIN_DESCRIPTION,
+        icon=PLUGIN_ICON,
         capabilities=(
             PluginCapability.APPLICATION,
             PluginCapability.PROCESSING,
@@ -42,6 +46,21 @@ class PulseTransientCharacterizationPlugin(PluginBase):
     RECIPE_LAUNCHERS = {
         PULSE_CAMPAIGN_RECIPE.recipe_id: "run_campaign_from_selection",
     }
+    WELCOME_TILES = (
+        WelcomeTile(
+            id="application",
+            title=PLUGIN_NAME,
+            description=PLUGIN_DESCRIPTION,
+            icon=PLUGIN_ICON,
+        ),
+        WelcomeTile(
+            id="demo-campaign",
+            title=_("Open demo campaign"),
+            description=_("Generate and select the synthetic 500-shot pulse campaign"),
+            icon=DEMO_ICON,
+            launcher="open_demo_campaign",
+        ),
+    )
 
     @classmethod
     def materialize_example(cls, example_id: str) -> PluginExampleData | None:

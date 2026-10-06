@@ -97,6 +97,8 @@ provenance handling to `RecipeRunner`. Installed-wheel, hot-reload, unattended
 form, cancellation, rollback, and native HDF5 round-trip gates exercise the
 real host integration.
 
+The plugin also declares two tiles with `WELCOME_TILES` in the Applications section of the DataLab welcome page: **Pulse & Transient Characterization** opens its page in the **Applications** catalog, and **Open demo campaign** generates and selects the synthetic 500-shot campaign.
+
 DataLab-Web bundles the same plugin as a size- and SHA-256-checked pure-Python
 wheel. Its adapter reports `verified` only for DataLab-Web 0.9.0, Pyodide
 0.26.4, plugin 0.1.0, and recipe 1.1.0. The browser gate executes the

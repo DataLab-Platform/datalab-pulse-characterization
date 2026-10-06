@@ -103,6 +103,7 @@ def test_wheel_installs_and_resolves_entry_point_outside_checkout(tmp_path) -> N
     probe = """
 import importlib
 import importlib.metadata as metadata
+import importlib.resources as resources
 import json
 
 distribution = next(metadata.distributions(path=[INSTALL_DIR]))
@@ -114,8 +115,10 @@ entry_point = next(
 plugin_class = entry_point.load()
 recipe = plugin_class.get_recipes()[0]
 module = importlib.import_module(plugin_class.__module__)
+icons = resources.files("datalab_pulse_characterization") / "icons"
 print(json.dumps({
     "entry_point": entry_point.name,
+    "icons": sorted(icon.name for icon in icons.iterdir()),
     "module_file": module.__file__,
     "plugin_id": plugin_class.get_plugin_id(),
     "recipe_id": recipe.recipe_id,
@@ -137,6 +140,7 @@ print(json.dumps({
 
     assert json.loads(completed.stdout) == {
         "entry_point": "datalab_pulse_characterization",
+        "icons": ["pulse_characterization.svg", "pulse_demo.svg"],
         "module_file": os.fspath(
             install_dir / "datalab_pulse_characterization" / "adapters" / "desktop.py"
         ),
