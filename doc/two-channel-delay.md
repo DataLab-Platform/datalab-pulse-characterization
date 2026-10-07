@@ -13,6 +13,7 @@ This recipe measures the delay and the relative timing jitter between a referenc
 - A shot present in one channel only is reported as `MISSING_REFERENCE` or `MISSING_MEASURED` with a `missing_channel` warning.
 - `plugin.org.datalab.pulse-characterization.channel` is optional. When the candidates carry exactly two channel labels, the first label in sorted order is proposed as the reference. This is a binding convenience: both hosts let the user change the roles. Before the run, the input check validates the shot numbers of each channel and requires a common X unit.
 - Both channels must use the same X unit; the cross-correlation delay also requires the same sampling interval.
+- To set the shot numbers and channel labels on your own signals, see [`preparing-signals.md`](preparing-signals.md).
 
 ## Physical Principle
 

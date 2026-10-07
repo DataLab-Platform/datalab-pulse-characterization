@@ -35,3 +35,4 @@ All notable changes to this project will be documented in this file.
 - Declare what each recipe expects (slot titles and descriptions, minimum shot counts, required shot-number metadata) and check selections before the run, so DataLab can tell whether the current selection is usable and why.
 - Let DataLab's generic launcher run the recipes on Desktop, replacing the two-channel role dialog; reference and measured channels are still proposed from their labels.
 - Pair the laser warm-up demonstration with both the stability and single-channel campaign methods; example parameter values are now keyed by method.
+- Document how to set shot numbers and channel labels on your own signals with DataLab's Add metadata dialog (`doc/preparing-signals.md`).
