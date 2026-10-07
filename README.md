@@ -14,6 +14,8 @@ The plugin offers five methods, each with its own generated demonstration:
 
 The new methods are documented in [`doc/shot-stability.md`](doc/shot-stability.md), [`doc/step-response.md`](doc/step-response.md), [`doc/two-channel-delay.md`](doc/two-channel-delay.md) and [`doc/pulse-height-spectrum.md`](doc/pulse-height-spectrum.md). Every demonstration is validated against its simulator truth in `tests/validation`. None of these conventions claims compliance with a standard.
 
+In DataLab Desktop and DataLab-Web, the **Oscilloscope simulator** tool acquires laser pulses, amplifier steps or delayed pulse pairs through a time base, vertical scales and an n-bit ADC, with a live view of the screen. Its acquisitions carry the shot and channel metadata the methods expect. See [`doc/oscilloscope-simulator.md`](doc/oscilloscope-simulator.md).
+
 ## Development
 
 ```bash

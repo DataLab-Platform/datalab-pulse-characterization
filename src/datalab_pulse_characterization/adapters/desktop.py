@@ -25,6 +25,7 @@ from ..demo import (
     TWO_CHANNEL_DEMO,
     materialize_generated_example,
 )
+from ..simulator import OSCILLOSCOPE_SIMULATOR_TOOL, OscilloscopeSimulator
 from ..workflow import (
     PULSE_CAMPAIGN_RECIPE,
     PULSE_HEIGHT_RECIPE,
@@ -59,6 +60,7 @@ class PulseTransientCharacterizationPlugin(PluginBase):
     )
     RECIPES = WORKFLOW_RECIPES
     EXAMPLES = DEMO_EXAMPLES
+    TOOLS = (OSCILLOSCOPE_SIMULATOR_TOOL,)
     WELCOME_TILES = (
         WelcomeTile(
             id="application",
@@ -80,6 +82,10 @@ class PulseTransientCharacterizationPlugin(PluginBase):
         """Build one deterministic demonstration campaign in memory."""
         cls.get_example(example_id)
         return materialize_generated_example(example_id)
+
+    def oscilloscope_simulator(self) -> OscilloscopeSimulator:
+        """Return a new oscilloscope simulator."""
+        return OscilloscopeSimulator()
 
     def open_demo_campaign(self) -> PluginExample | None:
         """Open the demonstration campaign from the plugin menu."""
