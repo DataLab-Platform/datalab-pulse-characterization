@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "datalab-pulse-characterization"
-version = "0.1.0"
-description = "Analyze repeated pulse acquisitions, timing and shot-to-shot stability"
+version = "0.2.0"
+description = "Analyze repeated pulse acquisitions: timing, stability, step response, delays and spectra"
 readme = "README.md"
 license = "BSD-3-Clause"
 license-files = ["LICENSE"]

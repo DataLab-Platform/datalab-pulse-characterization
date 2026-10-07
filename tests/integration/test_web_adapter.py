@@ -17,7 +17,14 @@ from datalab_pulse_characterization.adapters.web import (
     get_web_manifest,
     run_pulse_campaign_recipe,
 )
-from datalab_pulse_characterization.workflow import PULSE_CAMPAIGN_RECIPE
+from datalab_pulse_characterization.core import metadata_key
+from datalab_pulse_characterization.demo import EXAMPLES, TWO_CHANNEL_DEMO
+from datalab_pulse_characterization.workflow import (
+    CHANNEL_METADATA_KEY,
+    PULSE_CAMPAIGN_RECIPE,
+    RECIPES,
+    TWO_CHANNEL_DELAY_RECIPE,
+)
 
 
 def _pulse(title: str, center: float):
@@ -49,17 +56,43 @@ def test_web_adapter_declares_verified_version_matrix() -> None:
         "web_status": "verified",
         "datalab_web_version": "0.9.0",
         "pyodide_version": "0.26.4",
-        "recipe_id": PULSE_CAMPAIGN_RECIPE.recipe_id,
-        "recipe_version": PULSE_CAMPAIGN_RECIPE.version,
+        "recipes": [
+            {"recipe_id": recipe.recipe_id, "recipe_version": recipe.version}
+            for recipe in RECIPES
+        ],
+        "examples": [
+            "demo",
+            "stability-demo",
+            "step-response-demo",
+            "two-channel-demo",
+            "spectrum-demo",
+        ],
     }
     assert PulseTransientCharacterizationWebPlugin.get_plugin_id() == PLUGIN_ID
-    assert PulseTransientCharacterizationWebPlugin.get_recipes() == (
-        PULSE_CAMPAIGN_RECIPE,
-    )
-    assert PulseTransientCharacterizationWebPlugin.get_examples() == (PULSE_DEMO,)
+    assert PulseTransientCharacterizationWebPlugin.get_recipes() == RECIPES
+    assert PulseTransientCharacterizationWebPlugin.get_examples() == EXAMPLES
+    assert EXAMPLES[0] is PULSE_DEMO
     assert PluginCapability.APPLICATION in (
         PulseTransientCharacterizationWebPlugin.PLUGIN_INFO.capabilities
     )
+
+
+def test_web_adapter_suggests_two_channel_roles_from_channel_labels() -> None:
+    """Channel labels propose reference and measured slots; pairing uses shots."""
+    data = PulseTransientCharacterizationWebPlugin.materialize_example(
+        TWO_CHANNEL_DEMO.id
+    )
+    shot_key = metadata_key("shot")
+
+    bindings = TWO_CHANNEL_DELAY_RECIPE.suggest_bindings(data.objects)
+
+    assert {
+        signal.metadata[CHANNEL_METADATA_KEY] for signal in bindings["reference"]
+    } == {"CH1"}
+    assert len(bindings["reference"]) == 300
+    assert len(bindings["measured"]) == 297
+    assert all(shot_key in signal.metadata for signal in data.objects)
+    assert PULSE_CAMPAIGN_RECIPE.suggest_bindings is None
 
 
 def test_web_adapter_maps_signals_and_runs_headless_recipe() -> None:
@@ -94,7 +127,7 @@ def test_web_adapter_builds_reproducible_qualification_campaign() -> None:
     materialized = PulseTransientCharacterizationWebPlugin.materialize_example("demo")
     assert materialized is not None
     signals = materialized.objects
-    parameters = materialized.parameter_values
+    parameters = materialized.values_for(PULSE_CAMPAIGN_RECIPE.recipe_id)
 
     assert len(signals) == 500
     assert signals[0].title == "Synthetic shot 001"

@@ -1,6 +1,18 @@
 # Pulse & Transient Characterization
 
-Analyze repeated pulse acquisitions, timing and shot-to-shot stability
+Analyze repeated pulse acquisitions: timing, stability, step response, delays and spectra.
+
+The plugin offers five methods, each with its own generated demonstration:
+
+| Recipe | Physical question | Demonstration |
+| --- | --- | --- |
+| Single-channel pulse campaign | Which shots are valid, and what is the representative pulse? | 500 shots with drifts, jitter and explainable anomalies |
+| Shot-to-shot stability | How large are the timing jitter, the drifts and the energy fluctuations, and when do they change? | Laser warm-up: 600 pulses with drifts and a jitter increase |
+| Step response | What are the rise time, overshoot, settling time, ringing and bandwidth of a system? | 64 steps of an 80 MHz, 0.35-damped amplifier |
+| Two-channel delay and jitter | What is the delay between two channels, and which part of the jitter is common? | Reference and detector channels, 1 ns common and 0.2 ns detector jitter |
+| Pulse-height spectrum | What is the energy calibration and resolution of a detector? | NaI(Tl) events from Cs-137 and Co-60 sources |
+
+The new methods are documented in [`doc/shot-stability.md`](doc/shot-stability.md), [`doc/step-response.md`](doc/step-response.md), [`doc/two-channel-delay.md`](doc/two-channel-delay.md) and [`doc/pulse-height-spectrum.md`](doc/pulse-height-spectrum.md). Every demonstration is validated against its simulator truth in `tests/validation`. None of these conventions claims compliance with a standard.
 
 ## Development
 
@@ -45,9 +57,8 @@ reason is retained in its diagnostic.
 
 Non-finite core values such as the infinite SNR of a noiseless acquisition are
 serialized as `null` at the workflow boundary. The recipe is deliberately
-limited to one channel and one acquisition configuration. Inter-channel timing
-and configuration comparison are deferred with explicit activation gates in
-[`doc/deferred-scope.md`](doc/deferred-scope.md).
+limited to one channel and one acquisition configuration. Inter-channel timing is provided by the separate two-channel recipe, under the identity contract recorded in
+[`doc/deferred-scope.md`](doc/deferred-scope.md); configuration comparison remains deferred.
 
 Valid shots are aligned on their polarity-aware rising 50% crossing before the
 aligned mean is computed. The reference is the observed median crossing; for
@@ -91,7 +102,7 @@ distribution, truth fields, and limitations.
 ## Desktop and Web hosts
 
 DataLab Desktop registers **Run pulse campaign...** through the plugin entry
-point. The action requires at least two selected signals, opens the shared
+point. The action starts DataLab's generic recipe launcher on the selected signals (the campaign needs at least two), opens the shared
 parameter DataSet, and delegates output, anchored-result, rollback, and
 provenance handling to `RecipeRunner`. Installed-wheel, hot-reload, unattended
 form, cancellation, rollback, and native HDF5 round-trip gates exercise the
@@ -99,9 +110,11 @@ real host integration.
 
 The plugin also declares two tiles with `WELCOME_TILES` in the Applications section of the DataLab welcome page: **Pulse & Transient Characterization** opens its page in the **Applications** catalog, and **Open demo campaign** generates and selects the synthetic 500-shot campaign. When the section is short of room, **Open demo campaign** moves to the menu of the main tile.
 
+The plugin menu opens each of the five examples and runs each of the five recipes. Every recipe declares what it expects (minimum shot count, required shot-number metadata, channel hint) and checks the selection before the run: one acquisition per shot, enough samples for a step, a common X unit for two channels. The run actions delegate to DataLab's generic recipe launcher, which asks for an assignment only when the selection is ambiguous or invalid; for **Run two-channel delay...**, the reference and measured channels are proposed from their channel labels. The **Applications** catalog presents each method with its expected inputs, a live status for the current selection, and the examples designed for it; **Try with this example** opens such an example, prefills the method parameters, and runs the method. The laser warm-up campaign serves both the stability and the single-channel campaign methods.
+
 DataLab-Web bundles the same plugin as a size- and SHA-256-checked pure-Python
 wheel. Its adapter reports `verified` only for DataLab-Web 0.9.0, Pyodide
-0.26.4, plugin 0.1.0, and recipe 1.1.0. The browser gate executes the
+0.26.4 and plugin 0.2.0, with the campaign recipe 1.1.0 and the four other recipes 1.0.0. The browser gate executes the
 deterministic 500-shot campaign, checks all visible curves and the 500-row
 metrics table, and enforces explicit retained-data and WASM budgets. See
 [`doc/web-qualification.md`](doc/web-qualification.md) for the evidence and

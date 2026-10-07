@@ -15,10 +15,21 @@ from datalab.recipes import (
 from sigima.objects import SignalObj
 
 from .. import PLUGIN_DESCRIPTION, PLUGIN_ID, PLUGIN_NAME, __version__
-from ..demo import PULSE_DEMO, apply_parameter_values, build_simulated_campaign
+from ..demo import (
+    EXAMPLES as DEMO_EXAMPLES,
+)
+from ..demo import (
+    PULSE_DEMO,
+    apply_parameter_values,
+    build_simulated_campaign,
+    materialize_generated_example,
+)
 from ..workflow import (
     PULSE_CAMPAIGN_RECIPE,
     PulseCampaignRecipeParameters,
+)
+from ..workflow import (
+    RECIPES as WORKFLOW_RECIPES,
 )
 
 WEB_STATUS = "verified"
@@ -42,23 +53,20 @@ class PulseTransientCharacterizationWebPlugin(PluginBase):
             "https://github.com/DataLab-Platform/datalab-pulse-characterization"
         ),
     )
-    RECIPES = (PULSE_CAMPAIGN_RECIPE,)
-    EXAMPLES = (PULSE_DEMO,)
+    RECIPES = WORKFLOW_RECIPES
+    EXAMPLES = DEMO_EXAMPLES
 
     def create_actions(self) -> None:
         """Application actions are provided by DataLab-Web's generic host."""
 
     @classmethod
     def materialize_example(cls, example_id: str) -> PluginExampleData | None:
-        """Build the deterministic browser qualification campaign."""
+        """Build one deterministic generated example in memory."""
         cls.get_example(example_id)
-        if example_id != PULSE_DEMO.id:
-            return None
-        signals, parameter_values = build_simulated_campaign()
-        return PluginExampleData(signals, parameter_values)
+        return materialize_generated_example(example_id)
 
 
-def get_web_manifest() -> dict[str, str]:
+def get_web_manifest() -> dict[str, object]:
     """Return the explicit browser bundle and compatibility contract."""
     return {
         "plugin_id": PLUGIN_ID,
@@ -66,8 +74,11 @@ def get_web_manifest() -> dict[str, str]:
         "web_status": WEB_STATUS,
         "datalab_web_version": DATALAB_WEB_VERSION,
         "pyodide_version": PYODIDE_VERSION,
-        "recipe_id": PULSE_CAMPAIGN_RECIPE.recipe_id,
-        "recipe_version": PULSE_CAMPAIGN_RECIPE.version,
+        "recipes": [
+            {"recipe_id": recipe.recipe_id, "recipe_version": recipe.version}
+            for recipe in WORKFLOW_RECIPES
+        ],
+        "examples": [example.id for example in DEMO_EXAMPLES],
     }
 
 

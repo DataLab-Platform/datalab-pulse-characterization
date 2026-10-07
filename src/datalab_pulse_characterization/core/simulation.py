@@ -40,7 +40,8 @@ class PulseSimulationParameters:
     the last shot. ``amplitude_drift_fraction`` is the corresponding relative
     peak-to-peak amplitude change. Timing jitter switches from
     ``timing_jitter_std`` to ``late_timing_jitter_std`` after
-    ``jitter_transition_shot``.
+    ``jitter_transition_shot``. ``timing_drift`` is the total linear change of
+    the pulse arrival time from the first to the last shot.
     """
 
     shot_count: int = 500
@@ -78,6 +79,7 @@ class PulseSimulationParameters:
     multiple_pulse_shots: tuple[int, ...] = (145, 412)
     outlier_shots: tuple[int, ...] = (120, 320, 487)
     seed: int = 20260809
+    timing_drift: float = 0.0
 
     def __post_init__(self) -> None:
         """Validate the scenario before allocating acquisition arrays."""
@@ -114,6 +116,7 @@ class PulseSimulationParameters:
             ("Outlier amplitude multiplier", self.outlier_amplitude_multiplier),
             ("Double-pulse separation", self.double_pulse_separation),
             ("Double-pulse amplitude ratio", self.double_pulse_amplitude_ratio),
+            ("Timing drift", self.timing_drift),
         ):
             _validate_finite(value, name)
         if self.x_min >= self.x_max:
@@ -211,6 +214,7 @@ class PulseShotTruth:
     timing_offset: float
     timing_jitter_std: float
     baseline_noise_std: float
+    timing_drift_offset: float = 0.0
 
 
 @dataclasses.dataclass(frozen=True)
@@ -310,7 +314,9 @@ def _validate_classification_envelope(
         * parameters.pulse_width
         * max(parameters.asymmetric_rise_factor, parameters.asymmetric_fall_factor)
     )
-    jitter_extent = 6.0 * parameters.late_timing_jitter_std
+    jitter_extent = 6.0 * parameters.late_timing_jitter_std + 0.5 * abs(
+        parameters.timing_drift
+    )
     if parameters.pulse_center - profile_extent - jitter_extent <= baseline_start_stop:
         raise ValueError("Pulse profile may overlap the initial baseline")
     if parameters.multiple_pulse_shots and (
@@ -501,7 +507,8 @@ def simulate_pulse_campaign(
             else parameters.late_timing_jitter_std
         )
         timing_offset = float(rng.normal(0.0, jitter_std))
-        center = parameters.pulse_center + timing_offset
+        timing_drift_offset = parameters.timing_drift * centered_fraction
+        center = parameters.pulse_center + timing_offset + timing_drift_offset
         profile = parameters.profiles[(shot_index - 1) % len(parameters.profiles)]
         anomaly = anomaly_by_shot.get(shot_index, PulseAnomaly.NONE)
         noise_std = (
@@ -580,6 +587,7 @@ def simulate_pulse_campaign(
                 timing_offset=timing_offset,
                 timing_jitter_std=jitter_std,
                 baseline_noise_std=noise_std,
+                timing_drift_offset=timing_drift_offset,
             )
         )
 

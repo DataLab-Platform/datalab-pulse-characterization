@@ -83,3 +83,16 @@ statuses still come from the normal Sigima-backed path.
 Simulation truth is test and demonstration evidence only. It is not imported by
 the workflow recipe and does not weaken the requirement for documented real
 acquisitions and scientific review before a stable release.
+
+## Additional methods
+
+Four more recipes follow the same layering:
+
+| Core | Workflow | Simulator |
+| --- | --- | --- |
+| `core.stability` | `workflow.stability` | `core.simulation` with `timing_drift` |
+| `core.step_response` | `workflow.step_response` | `core.step_simulation` |
+| `core.two_channel` | `workflow.two_channel` | `core.two_channel_simulation` |
+| `core.spectroscopy` | `workflow.spectroscopy` | `core.spectrum_simulation` |
+
+The stability, step-response and two-channel recipes reuse `core.campaign` for per-shot features and quality, and the step-response recipe reuses `core.alignment` to average aligned steps. `workflow.outputs` holds the signal and table builders shared by the new recipes. `workflow.recipes` registers the five descriptors in `RECIPES`, and the host-neutral `demo` module declares one generated example per recipe for both adapters.

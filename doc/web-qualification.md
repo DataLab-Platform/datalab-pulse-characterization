@@ -2,12 +2,15 @@
 
 The Pulse Web adapter is tested against one explicit browser matrix:
 
-| Component             | Version |
-| --------------------- | ------- |
-| DataLab-Web           | 0.9.0   |
-| Pyodide               | 0.26.4  |
-| Pulse plugin          | 0.1.0   |
-| Pulse campaign recipe | 1.1.0   |
+| Component                                                                                  | Version |
+| ------------------------------------------------------------------------------------------ | ------- |
+| DataLab-Web                                                                                | 0.9.0   |
+| Pyodide                                                                                    | 0.26.4  |
+| Pulse plugin                                                                               | 0.2.0   |
+| Pulse campaign recipe                                                                      | 1.1.0   |
+| Shot-to-shot stability, step response, two-channel delay and pulse-height spectrum recipes | 1.0.0   |
+
+The four 1.0.0 recipes are qualified by DataLab-Web's `tests/e2e/application_methods.spec.ts`: each generated example is opened through its deep link, its recipe is started from the Applications dialog, and the created outputs must appear in the visible object tree without page errors. The two-channel example must bind its `reference` and `measured` slots from channel labels without asking the user. DataLab-Web's Python contracts run the same pairs through the generic host. The detailed visible and memory gates below apply to the campaign recipe.
 
 ## Visible workflow gate
 
