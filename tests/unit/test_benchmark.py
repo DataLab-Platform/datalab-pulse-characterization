@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from benchmarks.benchmark_alignment import BenchmarkConfiguration, run_benchmark
+from datalab_pulse_characterization import __version__
 
 ROOT = Path(__file__).parents[2]
 EXPECTED_WHEEL_HASHES = {
@@ -43,7 +44,7 @@ def test_small_benchmark_reports_time_memory_quality_and_truth() -> None:
     assert report["total_elapsed_s_per_run"] > 0.0
     assert report["shots_per_s"] > 0.0
     assert report["peak_incremental_python_bytes"] > 0
-    assert report["pulse"] == "0.1.0"
+    assert report["pulse"] == __version__
     quality = report["quality"]
     assert quality["aligned_shot_count"] == 12
     assert quality["status_counts"] == {"VALID": 12}

@@ -1,25 +1,41 @@
-"""DataLab Desktop plugin adapter."""
+"""DataLab Desktop plugin adapter.
+
+DataLab runs the recipes through its generic interaction: it assigns the
+selected signals to the recipe inputs (channels from their metadata), checks
+them, edits the parameters, then runs the recipe.
+"""
 
 from __future__ import annotations
 
 from datalab.config import _
-from datalab.gui.recipe_runner import RecipeCommitError, RecipeRunner
 from datalab.plugin_examples import PluginExample, PluginExampleData
 from datalab.plugin_tiles import WelcomeTile
 from datalab.plugins import PluginBase, PluginCapability, PluginInfo
-from datalab.recipes import RecipeOutcome, RecipeValidationError
+from datalab.recipes import RecipeOutcome
 
 from .. import PLUGIN_DESCRIPTION, PLUGIN_ID, PLUGIN_NAME, __version__
-from ..demo import PULSE_DEMO, apply_parameter_values, build_simulated_campaign
+from ..demo import (
+    EXAMPLES as DEMO_EXAMPLES,
+)
+from ..demo import (
+    PULSE_DEMO,
+    SPECTRUM_DEMO,
+    STABILITY_DEMO,
+    STEP_RESPONSE_DEMO,
+    TWO_CHANNEL_DEMO,
+    materialize_generated_example,
+)
 from ..workflow import (
     PULSE_CAMPAIGN_RECIPE,
-    PulseCampaignRecipeParameters,
+    PULSE_HEIGHT_RECIPE,
+    PULSE_STABILITY_RECIPE,
+    STEP_RESPONSE_RECIPE,
+    TWO_CHANNEL_DELAY_RECIPE,
 )
 from ..workflow import (
     RECIPES as WORKFLOW_RECIPES,
 )
 
-MINIMUM_SELECTED_SIGNAL_COUNT = 2
 PLUGIN_ICON = "datalab_pulse_characterization:icons/pulse_characterization.svg"
 DEMO_ICON = "datalab_pulse_characterization:icons/pulse_demo.svg"
 
@@ -42,10 +58,7 @@ class PulseTransientCharacterizationPlugin(PluginBase):
         ),
     )
     RECIPES = WORKFLOW_RECIPES
-    EXAMPLES = (PULSE_DEMO,)
-    RECIPE_LAUNCHERS = {
-        PULSE_CAMPAIGN_RECIPE.recipe_id: "run_campaign_from_selection",
-    }
+    EXAMPLES = DEMO_EXAMPLES
     WELCOME_TILES = (
         WelcomeTile(
             id="application",
@@ -64,75 +77,52 @@ class PulseTransientCharacterizationPlugin(PluginBase):
 
     @classmethod
     def materialize_example(cls, example_id: str) -> PluginExampleData | None:
-        """Build the deterministic demonstration campaign in memory."""
+        """Build one deterministic demonstration campaign in memory."""
         cls.get_example(example_id)
-        if example_id != PULSE_DEMO.id:
-            return None
-        signals, parameter_values = build_simulated_campaign()
-        return PluginExampleData(signals, parameter_values)
-
-    def launch_example(self, example_id: str) -> PluginExample | None:
-        """Open the demo campaign and select its signals for the recipe."""
-        example = super().launch_example(example_id)
-        if example is not None:
-            signals = self.signalpanel.objmodel.get_all_objects()
-            self.signalpanel.objview.select_objects(signals)
-        return example
+        return materialize_generated_example(example_id)
 
     def open_demo_campaign(self) -> PluginExample | None:
         """Open the demonstration campaign from the plugin menu."""
         return self.launch_example(PULSE_DEMO.id)
 
-    @staticmethod
-    def can_run_campaign(_selected_groups, selected_objects) -> bool:
-        """Return whether the selected signals form a repeated campaign."""
-        return len(selected_objects) >= MINIMUM_SELECTED_SIGNAL_COUNT
+    def open_stability_demo(self) -> PluginExample | None:
+        """Open the laser warm-up stability demonstration."""
+        return self.launch_example(STABILITY_DEMO.id)
 
-    def edit_campaign_parameters(
-        self,
-        parameters: PulseCampaignRecipeParameters | None = None,
-    ) -> PulseCampaignRecipeParameters | None:
-        """Edit Pulse campaign parameters with the Desktop as dialog parent."""
-        if self.main is None:
-            raise RuntimeError("Plugin must be registered before editing parameters")
-        if parameters is None:
-            parameters = PulseCampaignRecipeParameters()
-            if self.last_example_data is not None:
-                # Seed the dialog with the opened demo's reference values.
-                apply_parameter_values(
-                    parameters, self.last_example_data.parameter_values
-                )
-        elif not isinstance(parameters, PulseCampaignRecipeParameters):
-            raise TypeError("Parameters must be PulseCampaignRecipeParameters")
-        if parameters.edit(parent=self.main):
-            return parameters
-        return None
+    def open_step_response_demo(self) -> PluginExample | None:
+        """Open the amplifier step-response demonstration."""
+        return self.launch_example(STEP_RESPONSE_DEMO.id)
 
-    def run_campaign_from_selection(self) -> RecipeOutcome | None:
-        """Edit parameters and run the shared recipe on selected signals."""
-        if self.main is None:
-            raise RuntimeError("Plugin must be registered before running a recipe")
-        selected_signals = tuple(
-            self.signalpanel.objview.get_sel_objects(include_groups=True)
-        )
-        if not self.can_run_campaign((), selected_signals):
-            self.show_warning(_("Select at least two signals for a Pulse campaign"))
-            return None
-        parameters = self.edit_campaign_parameters()
-        if parameters is None:
-            return None
-        try:
-            return RecipeRunner(self.main).run(
-                PULSE_CAMPAIGN_RECIPE,
-                {"signals": selected_signals},
-                parameters,
-            )
-        except (RecipeCommitError, RecipeValidationError) as error:
-            self.show_error(str(error))
-            return None
+    def open_two_channel_demo(self) -> PluginExample | None:
+        """Open the two-channel delay demonstration."""
+        return self.launch_example(TWO_CHANNEL_DEMO.id)
+
+    def open_spectrum_demo(self) -> PluginExample | None:
+        """Open the gamma-ray spectroscopy demonstration."""
+        return self.launch_example(SPECTRUM_DEMO.id)
+
+    def run_campaign(self) -> RecipeOutcome | None:
+        """Analyze and align the selected pulse acquisitions."""
+        return self.start_recipe(PULSE_CAMPAIGN_RECIPE.recipe_id)
+
+    def run_stability(self) -> RecipeOutcome | None:
+        """Analyze the shot-to-shot stability of the selected signals."""
+        return self.start_recipe(PULSE_STABILITY_RECIPE.recipe_id)
+
+    def run_step_response(self) -> RecipeOutcome | None:
+        """Analyze the step response of the selected signals."""
+        return self.start_recipe(STEP_RESPONSE_RECIPE.recipe_id)
+
+    def run_spectrum(self) -> RecipeOutcome | None:
+        """Build the pulse-height spectrum of the selected events."""
+        return self.start_recipe(PULSE_HEIGHT_RECIPE.recipe_id)
+
+    def run_two_channel(self) -> RecipeOutcome | None:
+        """Measure the delay between the two selected channels."""
+        return self.start_recipe(TWO_CHANNEL_DELAY_RECIPE.recipe_id)
 
     def create_actions(self) -> None:
-        """Create the complete single-channel Pulse campaign actions."""
+        """Create the Pulse example and recipe actions."""
         handler = self.signalpanel.acthandler
         with handler.new_menu(PLUGIN_NAME.replace("&", "&&")):
             self.open_demo_action = handler.new_action(
@@ -141,9 +131,58 @@ class PulseTransientCharacterizationPlugin(PluginBase):
                 tip=_("Generate and select the synthetic 500-shot pulse campaign"),
                 select_condition="always",
             )
+            self.open_stability_demo_action = handler.new_action(
+                _("Open stability example"),
+                triggered=self.open_stability_demo,
+                tip=_("Generate and select a synthetic laser warm-up campaign"),
+                select_condition="always",
+            )
+            self.open_step_response_demo_action = handler.new_action(
+                _("Open step-response example"),
+                triggered=self.open_step_response_demo,
+                tip=_("Generate and select synthetic amplifier step responses"),
+                select_condition="always",
+            )
+            self.open_two_channel_demo_action = handler.new_action(
+                _("Open two-channel example"),
+                triggered=self.open_two_channel_demo,
+                tip=_("Generate and select a synthetic two-channel campaign"),
+                select_condition="always",
+            )
+            self.open_spectrum_demo_action = handler.new_action(
+                _("Open gamma spectrum example"),
+                triggered=self.open_spectrum_demo,
+                tip=_("Generate and select synthetic scintillation events"),
+                select_condition="always",
+            )
             self.run_campaign_action = handler.new_action(
                 _("Run pulse campaign..."),
-                triggered=self.run_campaign_from_selection,
+                triggered=self.run_campaign,
                 tip=_("Analyze and align the selected repeated pulse acquisitions"),
-                select_condition=self.can_run_campaign,
+                select_condition="at_least_one",
+                separator=True,
+            )
+            self.run_stability_action = handler.new_action(
+                _("Run shot-to-shot stability..."),
+                triggered=self.run_stability,
+                tip=_("Measure timing jitter, drifts and amplitude stability"),
+                select_condition="at_least_one",
+            )
+            self.run_step_response_action = handler.new_action(
+                _("Run step response..."),
+                triggered=self.run_step_response,
+                tip=_("Measure rise time, overshoot, settling and ringing"),
+                select_condition="at_least_one",
+            )
+            self.run_two_channel_action = handler.new_action(
+                _("Run two-channel delay..."),
+                triggered=self.run_two_channel,
+                tip=_("Measure delay and relative jitter between two channels"),
+                select_condition="at_least_one",
+            )
+            self.run_spectrum_action = handler.new_action(
+                _("Run pulse-height spectrum..."),
+                triggered=self.run_spectrum,
+                tip=_("Build, calibrate and analyze an energy spectrum"),
+                select_condition="at_least_one",
             )

@@ -24,6 +24,8 @@ shots use the larger late-jitter deviation. `PulseShotTruth` retains the actual
 offset and requested deviation, so the transition can be inspected without
 inferring it from extracted features.
 
+The opt-in `timing_drift` adds a linear change of the arrival time over the campaign, recorded per shot in `PulseShotTruth.timing_drift_offset`. Its default of zero keeps the default campaign bitwise identical. The stability demonstration uses it with a single Gaussian profile; the step-response, two-channel and spectroscopy demonstrations use their own simulators, described in their method pages.
+
 ## Demonstration Scenario
 
 `PulseSimulationParameters()` defines the versioned demonstration shape used by

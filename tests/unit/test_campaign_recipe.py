@@ -127,7 +127,8 @@ def test_campaign_recipe_builds_anchored_table_and_diagnostics() -> None:
 
 def test_campaign_recipe_descriptor_declares_many_signal_inputs() -> None:
     """The registry exposes the stable single-channel batch contract."""
-    assert RECIPES == (PULSE_CAMPAIGN_RECIPE,)
+    assert RECIPES[0] is PULSE_CAMPAIGN_RECIPE
+    assert len({recipe.recipe_id for recipe in RECIPES}) == len(RECIPES) == 5
     assert PULSE_CAMPAIGN_RECIPE.recipe_id.endswith(":single-channel-campaign")
     assert PULSE_CAMPAIGN_RECIPE.title == "Single-channel pulse campaign"
     assert PULSE_CAMPAIGN_RECIPE.version == "1.1.0"
