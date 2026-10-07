@@ -36,3 +36,4 @@ All notable changes to this project will be documented in this file.
 - Let DataLab's generic launcher run the recipes on Desktop, replacing the two-channel role dialog; reference and measured channels are still proposed from their labels.
 - Pair the laser warm-up demonstration with both the stability and single-channel campaign methods; example parameter values are now keyed by method.
 - Document how to set shot numbers and channel labels on your own signals with DataLab's Add metadata dialog (`doc/preparing-signals.md`).
+- Add an oscilloscope simulator tool, in DataLab Desktop and DataLab-Web: a laser pulse, an amplifier step or a delayed pulse pair seen through a time base, vertical scales and an n-bit ADC, with a live view, and acquisitions tagged for the Pulse methods (`doc/oscilloscope-simulator.md`).

@@ -5,6 +5,8 @@ exact settings used for every waveform. It is designed to exercise the normal
 Sigima-backed analysis path with reproducible drift, jitter, noise, and quality
 failures. It is not a calibrated oscilloscope model.
 
+In DataLab, the oscilloscope simulator tool acquires pulses, amplifier steps and delayed pulse pairs interactively, through a time base and a digitizing front end. See [`oscilloscope-simulator.md`](oscilloscope-simulator.md).
+
 ## Waveform Model
 
 Every acquisition uses the same evenly sampled X axis. Regular shots alternate

@@ -24,6 +24,7 @@ from ..demo import (
     build_simulated_campaign,
     materialize_generated_example,
 )
+from ..simulator import OSCILLOSCOPE_SIMULATOR_TOOL, OscilloscopeSimulator
 from ..workflow import (
     PULSE_CAMPAIGN_RECIPE,
     PulseCampaignRecipeParameters,
@@ -55,9 +56,14 @@ class PulseTransientCharacterizationWebPlugin(PluginBase):
     )
     RECIPES = WORKFLOW_RECIPES
     EXAMPLES = DEMO_EXAMPLES
+    TOOLS = (OSCILLOSCOPE_SIMULATOR_TOOL,)
 
     def create_actions(self) -> None:
         """Application actions are provided by DataLab-Web's generic host."""
+
+    def oscilloscope_simulator(self) -> OscilloscopeSimulator:
+        """Return a new oscilloscope simulator."""
+        return OscilloscopeSimulator()
 
     @classmethod
     def materialize_example(cls, example_id: str) -> PluginExampleData | None:
