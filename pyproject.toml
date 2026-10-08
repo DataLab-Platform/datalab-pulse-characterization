@@ -10,7 +10,12 @@ readme = "README.md"
 license = "BSD-3-Clause"
 license-files = ["LICENSE"]
 requires-python = ">=3.9"
-dependencies = ["datalab-platform >= 1.3"]
+dependencies = ["datalab-platform >= 1.3, < 2"]
+keywords = ["datalab", "datalab-plugin", "pulse", "jitter", "step response"]
+
+[project.urls]
+Homepage = "https://github.com/DataLab-Platform/datalab-pulse-characterization"
+Issues = "https://github.com/DataLab-Platform/datalab-pulse-characterization/issues"
 
 [project.entry-points."datalab.plugins"]
 datalab_pulse_characterization = "datalab_pulse_characterization.adapters.desktop:PulseTransientCharacterizationPlugin"
