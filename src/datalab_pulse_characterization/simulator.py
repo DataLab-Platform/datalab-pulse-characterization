@@ -12,13 +12,13 @@ import itertools
 
 import guidata.dataset as gds
 import numpy as np
-from datalab.plugin_instruments import (
+from datalab.plugins.instruments import (
     InstrumentAcquisition,
     InstrumentFrame,
     PluginInstrument,
 )
-from datalab.plugin_tools import PluginTool
-from datalab.recipes import RecipeObjectType
+from datalab.plugins.recipes import RecipeObjectType
+from datalab.plugins.tools import PluginTool
 from sigima.objects import SignalObj, create_signal
 
 from .core import metadata_key

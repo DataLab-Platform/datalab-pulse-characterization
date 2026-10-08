@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
 
-from datalab.plugin_examples import PluginExample, PluginExampleData
-from datalab.recipes import RecipeValidationError
+from datalab.plugins.examples import PluginExample, PluginExampleData
+from datalab.plugins.recipes import RecipeValidationError
 from sigima.objects import SignalObj, create_signal
 
 from .core import (

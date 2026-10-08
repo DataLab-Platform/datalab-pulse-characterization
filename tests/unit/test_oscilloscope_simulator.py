@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-from datalab.plugin_instruments import InstrumentAcquisition, InstrumentFrame
-from datalab.recipe_binding import (
+from datalab.plugins.instruments import InstrumentAcquisition, InstrumentFrame
+from datalab.plugins.recipe_binding import (
     RecipeReadinessStatus,
     assess_recipe_inputs,
     create_recipe_parameters,
 )
-from datalab.recipes import RecipeExecutionContext
+from datalab.plugins.recipes import RecipeExecutionContext
 
 from datalab_pulse_characterization.core.oscilloscope import (
     OscilloscopeSettings,

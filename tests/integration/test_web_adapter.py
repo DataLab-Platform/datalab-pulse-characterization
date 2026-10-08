@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 from datalab.plugins import PluginCapability
-from datalab.recipes import RecipeValidationError
+from datalab.plugins.recipes import RecipeValidationError
 from sigima.objects import create_signal
 
 from datalab_pulse_characterization import PLUGIN_ID, __version__

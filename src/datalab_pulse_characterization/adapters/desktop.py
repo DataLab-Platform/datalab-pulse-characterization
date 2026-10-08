@@ -8,10 +8,10 @@ them, edits the parameters, then runs the recipe.
 from __future__ import annotations
 
 from datalab.config import _
-from datalab.plugin_examples import PluginExample, PluginExampleData
-from datalab.plugin_tiles import WelcomeTile
 from datalab.plugins import PluginBase, PluginCapability, PluginInfo
-from datalab.recipes import RecipeOutcome
+from datalab.plugins.examples import PluginExample, PluginExampleData
+from datalab.plugins.recipes import RecipeOutcome
+from datalab.plugins.tiles import WelcomeTile
 
 from .. import PLUGIN_DESCRIPTION, PLUGIN_ID, PLUGIN_NAME, __version__
 from ..demo import (

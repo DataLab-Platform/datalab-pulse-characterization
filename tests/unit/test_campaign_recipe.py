@@ -6,7 +6,7 @@ import json
 
 import numpy as np
 import pytest
-from datalab.recipes import (
+from datalab.plugins.recipes import (
     RecipeCancellationError,
     RecipeExecutionContext,
     RecipeValidationError,

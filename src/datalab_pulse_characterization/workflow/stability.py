@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import guidata.dataset as gds
 import numpy as np
-from datalab.recipes import (
+from datalab.plugins.recipes import (
     RecipeDiagnostic,
     RecipeDiagnosticLevel,
     RecipeExecutionContext,

@@ -7,7 +7,7 @@ from numbers import Integral, Real
 
 import guidata.dataset as gds
 import numpy as np
-from datalab.recipes import (
+from datalab.plugins.recipes import (
     RecipeDiagnostic,
     RecipeDiagnosticLevel,
     RecipeExecutionContext,
