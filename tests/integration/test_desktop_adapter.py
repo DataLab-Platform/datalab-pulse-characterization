@@ -10,11 +10,11 @@ import pytest
 from datalab.adapters_metadata import TableAdapter
 from datalab.env import execenv
 from datalab.gui.actionhandler import ActionCategory
-from datalab.gui.recipe_inputs import RecipeInputDialog
+from datalab.gui.plugins.recipe_inputs import RecipeInputDialog
 from datalab.objectmodel import get_uuid
 from datalab.plugins import PluginCapability
-from datalab.recipe_binding import RecipeReadinessStatus
-from datalab.recipes import RECIPE_RUN_RECORD_OPTION, RecipeRunRecord
+from datalab.plugins.recipe_binding import RecipeReadinessStatus
+from datalab.plugins.recipes import RECIPE_RUN_RECORD_OPTION, RecipeRunRecord
 from datalab.tests import datalab_test_app_context
 from guidata.dataset import update_dataset
 from sigima.objects import SignalObj, create_signal

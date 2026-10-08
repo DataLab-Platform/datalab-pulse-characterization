@@ -13,10 +13,10 @@ from datalab.adapters_metadata import TableAdapter
 from datalab.config import Conf
 from datalab.env import execenv
 from datalab.gui.actionhandler import ActionCategory
-from datalab.gui.recipe_runner import RecipeRunner
+from datalab.gui.plugins.recipe_runner import RecipeRunner
 from datalab.objectmodel import get_uuid
 from datalab.plugins import PluginRegistry
-from datalab.recipes import RECIPE_RUN_RECORD_OPTION, RecipeRunRecord
+from datalab.plugins.recipes import RECIPE_RUN_RECORD_OPTION, RecipeRunRecord
 from datalab.tests import datalab_test_app_context
 from sigima.objects import SignalObj, create_signal
 

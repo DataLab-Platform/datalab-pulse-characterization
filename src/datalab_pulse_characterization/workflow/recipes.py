@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datalab.recipes import (
+from datalab.plugins.recipes import (
     RecipeCardinality,
     RecipeDescriptor,
     RecipeInputSlot,

@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 import guidata.dataset as gds
-from datalab.recipes import RecipeDiagnostic, RecipeInputs
+from datalab.plugins.recipes import RecipeDiagnostic, RecipeInputs
 from sigima.objects import SignalObj
 
 from .campaign import _acquisitions
