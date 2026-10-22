@@ -1,4 +1,4 @@
-# Pulse & Transient Characterization
+# <img src="src/datalab_pulse_characterization/icons/pulse_characterization.svg" alt="" width="48" align="absmiddle"> Pulse & Transient Characterization
 
 A [DataLab](https://datalab-platform.com/) plugin to analyze repeated pulse acquisitions: shot quality, stability, step response, delay between channels and pulse-height spectra.
 
