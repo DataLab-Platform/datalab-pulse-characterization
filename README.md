@@ -20,6 +20,8 @@ Each method comes with a generated demonstration.
 
 ## Installation
 
+Python 3.10 or later is required in a Python environment; the standalone DataLab application supplies its own interpreter.
+
 - **DataLab Desktop:** the plugin needs DataLab 1.4 or later (not released yet). Download the wheel (`.whl`) attached to the latest [release](https://github.com/DataLab-Platform/datalab-pulse-characterization/releases) and install it with **Plugins > Configure plugins... > Install plugins**. This also works with the standalone version of DataLab. In a Python environment, you may instead install it with pip:
 
   ```bash
