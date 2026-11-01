@@ -25,7 +25,7 @@ Tools and examples:
 
 DataLab integration:
 
-- DataLab Desktop: plugin menu, Applications catalog, welcome page tiles, and results saved with their provenance in DataLab workspaces.
+- DataLab Desktop: plugin menu, Applications panel, welcome page tiles, and results saved with their provenance in DataLab workspaces.
 - DataLab-Web: the same methods, verified for DataLab-Web 0.9.0 and Pyodide 0.26.4.
 
 Quality:
