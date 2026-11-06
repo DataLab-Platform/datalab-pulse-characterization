@@ -47,14 +47,14 @@ def _parameters() -> dict[str, object]:
     }
 
 
-def test_web_adapter_declares_verified_version_matrix() -> None:
-    """The qualified bundle declares its exact verified browser target."""
+def test_web_adapter_declares_candidate_version_matrix() -> None:
+    """The manifest names the browser-qualified candidate matrix."""
     assert WEB_STATUS == "verified"
     assert get_web_manifest() == {
         "plugin_id": PLUGIN_ID,
         "plugin_version": __version__,
         "web_status": "verified",
-        "datalab_web_version": "0.9.0",
+        "datalab_web_version": "0.11.0",
         "pyodide_version": "0.26.4",
         "recipes": [
             {"recipe_id": recipe.recipe_id, "recipe_version": recipe.version}

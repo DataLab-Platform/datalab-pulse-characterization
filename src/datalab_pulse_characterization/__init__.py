@@ -6,7 +6,7 @@ PLUGIN_DESCRIPTION = (
 )
 PLUGIN_ID = "org.datalab.pulse-characterization"
 PLUGIN_NAME = "Pulse & Transient Characterization"
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 __all__ = [
     "PLUGIN_DESCRIPTION",

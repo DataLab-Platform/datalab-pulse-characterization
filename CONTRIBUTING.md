@@ -2,13 +2,15 @@
 
 ## Setup and Checks
 
-Install the project in editable mode, in a Python environment where DataLab 1.3 or later is available, then run the checks before submitting a change:
+Install the project in editable mode, in a Python environment where DataLab 1.4 or later is available, then run the checks before submitting a change:
 
 ```bash
 python -m pip install -e ".[test]"
 python -m ruff check .
 python -m pytest
 ```
+
+CI runs the published DataLab 1.4.0, Sigima 1.4.0 and SigimaX 1.1.0 stack on Linux and Windows. A manual run can select a development branch with `stack-ref`; release tags run the checks before attaching the wheel.
 
 ## Trying the Plugin in DataLab
 
@@ -24,7 +26,7 @@ adapters -> workflow -> core
 
 - `core` holds the scientific code: per-shot analysis on Sigima pulse features, quality classification, alignment, the five methods and their simulators. It works on immutable NumPy acquisitions and does not import DataLab. `core.metadata` owns the `plugin.org.datalab.pulse-characterization.*` keys.
 - `workflow` turns the core into headless DataLab recipes, registered in `RECIPES`. It converts inputs and parameters, checks selections, builds the output signals and tables, and turns invalid shots into diagnostics. It never imports GUI modules.
-- `adapters/desktop.py` and `adapters/web.py` declare the actions, examples, tools and welcome tiles. The run actions call DataLab's generic recipe launcher; DataLab's `RecipeRunner` owns validation, transactional commit and provenance. `adapters/web.py` also records the verified DataLab-Web matrix.
+- `adapters/desktop.py` and `adapters/web.py` declare the actions, examples, tools and welcome tiles. The run actions call DataLab's generic recipe launcher; DataLab's `RecipeRunner` owns validation, transactional commit and provenance. `adapters/web.py` also records the DataLab-Web target and its qualification status.
 - `simulator.py` exposes `core.oscilloscope` as a DataLab instrument. `demo.py` declares one generated example per method.
 
 | Method | Core | Workflow | Demonstration simulator |
