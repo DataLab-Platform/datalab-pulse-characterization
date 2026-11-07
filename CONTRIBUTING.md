@@ -10,7 +10,7 @@ python -m ruff check .
 python -m pytest
 ```
 
-CI runs the published DataLab 1.4.0, Sigima 1.4.0 and SigimaX 1.1.0 stack on Linux and Windows. A manual run can select a development branch with `stack-ref`; release tags run the checks before attaching the wheel.
+CI runs the published DataLab 1.4.0, Sigima 1.4.0 and SigimaX 1.1.0 stack on Linux and Windows. A manual run can select a development branch with `stack-ref`; release tags run the checks before the draft release is prepared (see [RELEASING.md](RELEASING.md)).
 
 ## Trying the Plugin in DataLab
 
@@ -60,4 +60,4 @@ The analysis processes one acquisition at a time and never builds a 2D stack of 
 
 ## Branches
 
-Day-to-day work lands on `develop`, the default branch: open pull requests against it. `main` is the release branch. It will be created at the first release, once the DataLab version that provides the plugin SDK is published; after that, `develop` is merged into `main` only to cut a release. This is the same model as DataLab, Sigima and DataLab-Web.
+Day-to-day work lands on `develop`, the default branch: open pull requests against it. `main` is the release branch: `develop` is merged into `main` only to cut a release (see [RELEASING.md](RELEASING.md)). This is the same model as DataLab, Sigima and DataLab-Web.
