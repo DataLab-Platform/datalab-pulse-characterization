@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "datalab-pulse-characterization"
-version = "0.2.0"
+version = "0.2.1"
 description = "Analyze repeated pulse acquisitions: timing, stability, step response, delays and spectra"
 readme = "README.md"
 license = "BSD-3-Clause"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
-dependencies = ["datalab-platform >= 1.3, < 2"]
+dependencies = ["datalab-platform >= 1.4, < 2"]
 keywords = ["datalab", "datalab-plugin", "pulse", "jitter", "step response"]
 
 [project.urls]

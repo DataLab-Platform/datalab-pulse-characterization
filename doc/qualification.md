@@ -41,7 +41,7 @@ Both hosts aligned 489 valid shots and found every expected status. Alignment re
 
 ## DataLab-Web
 
-The Web adapter reports `verified` only for this matrix:
+Version 0.2.0 was verified for this historical matrix:
 
 | Component | Version |
 | --- | --- |
@@ -51,10 +51,12 @@ The Web adapter reports `verified` only for this matrix:
 | Pulse campaign recipe | 1.1.0 |
 | Stability, step response, two-channel and spectrum recipes | 1.0.0 |
 
+The 0.2.1 candidate was prequalified with the DataLab-Web 0.11.0 candidate and Pyodide 0.26.4 in Chromium, so its Web manifest reports `verified` for that combination. The final gate must be repeated with the exact official release wheel before DataLab-Web is released.
+
 DataLab-Web's `tests/e2e/application_methods.spec.ts` opens each example through its deep link, runs its method from the **Applications** dialog and checks the outputs in the object tree. The two-channel example must bind its channels from their labels without asking. For the 500-shot campaign, a Playwright gate also requires:
 
 - visible **Pulse amplitude vs shot**, **Raw pulse campaign mean** and **Aligned pulse campaign mean** curves;
 - the **Pulse campaign shot metrics** table with 500 rows, and 489 `VALID` and aligned shots;
 - an incremental WASM heap of at most 64 MiB, and exactly 24,032 bytes of retained output arrays.
 
-Python bridge tests inject failures while inserting inputs and outputs, and require an exact rollback. The reference run on 2026-08-11 grew the WASM heap by 0 bytes.
+Python bridge tests inject failures while inserting inputs and outputs. The candidate browser test also injected a failure on the second output and verified that both panel trees and the retained array size were restored. The successful 500-shot run grew the WASM heap by 0 bytes and retained exactly 24,032 bytes of output arrays.

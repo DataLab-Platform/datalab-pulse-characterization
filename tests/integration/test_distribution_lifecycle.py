@@ -112,9 +112,16 @@ entry_point = next(
     for value in distribution.entry_points
     if value.group == "datalab.plugins"
 )
+web_entry_point = next(
+    value
+    for value in distribution.entry_points
+    if value.group == "datalab.web_plugins"
+)
 plugin_class = entry_point.load()
+web_plugin_class = web_entry_point.load()
 recipe = plugin_class.get_recipes()[0]
 module = importlib.import_module(plugin_class.__module__)
+web_module = importlib.import_module(web_plugin_class.__module__)
 icons = resources.files("datalab_pulse_characterization") / "icons"
 print(json.dumps({
     "entry_point": entry_point.name,
@@ -123,6 +130,9 @@ print(json.dumps({
     "plugin_id": plugin_class.get_plugin_id(),
     "recipe_id": recipe.recipe_id,
     "recipe_version": recipe.version,
+    "web_entry_point": web_entry_point.name,
+    "web_module_file": web_module.__file__,
+    "web_plugin_id": web_plugin_class.get_plugin_id(),
 }))
 """.replace("INSTALL_DIR", repr(os.fspath(install_dir)))
     environment = os.environ.copy()
@@ -147,6 +157,11 @@ print(json.dumps({
         "plugin_id": PLUGIN_ID,
         "recipe_id": PULSE_CAMPAIGN_RECIPE.recipe_id,
         "recipe_version": "1.1.0",
+        "web_entry_point": "datalab_pulse_characterization",
+        "web_module_file": os.fspath(
+            install_dir / "datalab_pulse_characterization" / "adapters" / "web.py"
+        ),
+        "web_plugin_id": PLUGIN_ID,
     }
 
 

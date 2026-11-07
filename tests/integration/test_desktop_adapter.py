@@ -72,7 +72,7 @@ def test_plugin_descriptor() -> None:
     """The entry point exposes stable SDK metadata and its headless recipe."""
     plugin_class = desktop_adapter.PulseTransientCharacterizationPlugin
     assert plugin_class.get_plugin_id() == "org.datalab.pulse-characterization"
-    assert plugin_class.PLUGIN_INFO.version == "0.2.0"
+    assert plugin_class.PLUGIN_INFO.version == "0.2.1"
     assert plugin_class.PLUGIN_INFO.capabilities == frozenset(
         {
             PluginCapability.APPLICATION,
